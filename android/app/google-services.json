@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "684790132195",
+    "firebase_url": "https://incircle-2666d.firebaseio.com",
+    "project_id": "incircle-2666d",
+    "storage_bucket": "incircle-2666d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684790132195:android:ad68c61d36bbe860cf44d6",
+        "android_client_info": {
+          "package_name": "com.prashantchanne.in_circle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "684790132195-4lh9ld3o22cq8urhjvb22v8tdf4hq2em.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.prashantchanne.in_circle",
+            "certificate_hash": "c31816474e00d259d7dfd15c48a4a88c09ff1164"
+          }
+        },
+        {
+          "client_id": "684790132195-d2jgbtd7bkjpmonad9u65d5lnhlqeqhd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCF7IdBpKYKTgDjQefKo1YYlIqhbURqPj4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "684790132195-d2jgbtd7bkjpmonad9u65d5lnhlqeqhd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
