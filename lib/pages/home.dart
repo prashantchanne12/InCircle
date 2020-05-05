@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/create_account.dart';
+import 'package:in_circle/widgets/progress.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final userRef = Firestore.instance.collection('users');
@@ -18,6 +19,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool isLogin = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -43,15 +45,20 @@ class _HomeState extends State<Home> {
       await createUserInFirestore();
       setState(() {
         isLogin = true;
+        isLoading = true;
       });
     } else {
       setState(() {
         isLogin = false;
+        isLoading = false;
       });
     }
   }
 
   createUserInFirestore() async {
+    setState(() {
+      isLoading = true;
+    });
     // Check if the users exists in database
     final GoogleSignInAccount user = googleSignIn.currentUser;
     DocumentSnapshot documentSnapshot = await userRef.document(user.id).get();
@@ -106,61 +113,63 @@ class _HomeState extends State<Home> {
 
   //----- Authentication Screen -------
   buildLoginScreen() {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: <Widget>[
-          Image.asset(
-            'assets/images/login.jpg',
-            height: double.infinity,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          Column(
-            children: <Widget>[
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(top: 150.0),
-                child: Text(
-                  'InCircle',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'mont',
-                    fontSize: 50.0,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 2.5,
-                  ),
-                  textAlign: TextAlign.center,
+    return isLoading
+        ? circularProgress()
+        : Scaffold(
+            backgroundColor: Colors.black,
+            body: Stack(
+              children: <Widget>[
+                Image.asset(
+                  'assets/images/login.jpg',
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
-              ),
-              SizedBox(
-                height: 130.0,
-              ),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    login();
-                  },
-                  child: Center(
-                    child: Container(
-                      width: 260.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(
-                              'assets/images/google_signin_button.png'),
-                          fit: BoxFit.cover,
+                Column(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.only(top: 150.0),
+                      child: Text(
+                        'InCircle',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'mont',
+                          fontSize: 50.0,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2.5,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
+                    SizedBox(
+                      height: 130.0,
+                    ),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          login();
+                        },
+                        child: Center(
+                          child: Container(
+                            width: 260.0,
+                            height: 50.0,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    'assets/images/google_signin_button.png'),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
-        ],
-      ),
-    );
+              ],
+            ),
+          );
   }
 
   @override

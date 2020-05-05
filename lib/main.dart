@@ -10,8 +10,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'InCircle',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        primaryColor: Colors.deepPurple,
+        primarySwatch: Colors.blue,
+        primaryColor: Color(0xff0984e3),
       ),
       home: Home(),
     );
