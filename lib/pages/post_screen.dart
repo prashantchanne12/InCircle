@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:in_circle/widgets/header.dart';
-import 'package:in_circle/widgets/post.dart';
+import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/progress.dart';
-
-import 'home.dart';
+import 'package:in_circle/widgets/post.dart';
+import 'package:in_circle/widgets/header.dart';
 
 class PostScreen extends StatelessWidget {
   final String userId;

@@ -151,6 +151,7 @@ class _UploadPostState extends State<UploadPost> {
 
   Scaffold buildUploadForm() {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Colors.white,

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ final userRef = Firestore.instance.collection('users');
 final activityFeedRef = Firestore.instance.collection('feed');
 final followersRef = Firestore.instance.collection('followers');
 final followingRef = Firestore.instance.collection('following');
-
+final timelineRef = Firestore.instance.collection('timeline');
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 DateTime timestamp = DateTime.now();
 User currentUser;
@@ -39,6 +40,9 @@ class _HomeState extends State<Home> {
   var phones = [];
   int selectIndex = 0;
   PageController pageController;
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   @override
   void initState() {
@@ -68,12 +72,57 @@ class _HomeState extends State<Home> {
         isLogin = true;
         isLoading = true;
       });
+
+      configurePushNotifications();
     } else {
       setState(() {
         isLogin = false;
         isLoading = false;
       });
     }
+  }
+
+  configurePushNotifications() {
+    final GoogleSignInAccount user = googleSignIn.currentUser;
+    _firebaseMessaging.getToken().then((token) {
+      print('Firebase Messaging Token $token');
+      userRef.document(user.id).updateData({"androidNotificationToken": token});
+    }, onError: (error) {
+      print("Error Occured while getting token $error");
+    });
+
+    _firebaseMessaging.configure(
+//        // when app is off
+//        onLaunch: (Map<String, dynamic> message) async {},
+//
+//        // when app is running in the background
+//        onResume: (Map<String, dynamic> message) async {},
+
+        // when app is active
+        onMessage: (Map<String, dynamic> message) async {
+      print("on message $message");
+      final String recipientId = message['data']['recipient'];
+      final String body = message['notification']['body'];
+
+      if (recipientId == user.id) {
+        print("Notification shown!");
+        SnackBar snackBar = SnackBar(
+          content: Text(
+            body,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+        _scaffoldKey.currentState.showSnackBar(snackBar);
+      } else {
+        print("Notification not shown!");
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    pageController.dispose();
   }
 
   createUserInFirestore() async {
@@ -105,10 +154,16 @@ class _HomeState extends State<Home> {
         'timestamp': timestamp,
       });
 
+      await followingRef
+          .document(user.id)
+          .collection('userFollowers')
+          .document(user.id)
+          .setData({});
+
       documentSnapshot = await userRef.document(user.id).get();
     }
     currentUser = User.fromDocument(documentSnapshot);
-    print(currentUser.displayName);
+//    print(currentUser.displayName);
   }
 
   login() {
@@ -121,6 +176,7 @@ class _HomeState extends State<Home> {
 
   buildHomePage() {
     return Scaffold(
+      key: _scaffoldKey,
       bottomNavigationBar: FFNavigationBar(
         theme: FFNavigationBarTheme(
           barBackgroundColor: Colors.white,
@@ -132,8 +188,10 @@ class _HomeState extends State<Home> {
         selectedIndex: selectIndex,
         onSelectTab: (index) {
           setState(() {
+            print('index $index');
             this.selectIndex = index;
           });
+          print('select index $selectIndex');
           pageController.animateToPage(selectIndex,
               duration: Duration(
                 milliseconds: 200,
@@ -165,7 +223,9 @@ class _HomeState extends State<Home> {
       ),
       body: PageView(
         children: <Widget>[
-          Timeline(),
+          Timeline(
+            user: currentUser,
+          ),
           ChatScreen(),
           UploadPost(
             user: currentUser,

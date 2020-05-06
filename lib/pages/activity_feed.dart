@@ -98,7 +98,7 @@ class ActivityFeedItem extends StatelessWidget {
   }
 
   configureMediaPreview(context) {
-    print('\n Median Url 2 $mediaUrl');
+//    print('\n Median Url 2 $mediaUrl');
     if (type == 'like' || type == 'comment') {
       mediaPreview = GestureDetector(
         onTap: () => showPost(context),
