@@ -236,6 +236,7 @@ class _HomeState extends State<Home> {
           ),
         ],
         controller: pageController,
+        physics: NeverScrollableScrollPhysics(),
       ),
     );
   }
