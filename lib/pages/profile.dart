@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/home.dart';
+import 'package:in_circle/widgets/post.dart';
+import 'package:in_circle/widgets/post_tile.dart';
 import 'package:in_circle/widgets/progress.dart';
 
 class Profile extends StatefulWidget {
@@ -15,14 +19,51 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   bool isFollowing = false;
+  bool isLoading = false;
+  String postOrientation = "grid";
+  int postCount = 0;
+  int followerCount = 0;
+  int followingCount = 0;
+  List<Post> posts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getProfilePosts();
+  }
+
+  getProfilePosts() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    QuerySnapshot querySnapshot = await postRef
+        .document(widget.profileId)
+        .collection('userPosts')
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+
+    setState(() {
+      isLoading = false;
+      postCount = querySnapshot.documents.length;
+
+      // posts - list containing objects of Post class
+      posts = querySnapshot.documents
+          .map((DocumentSnapshot documentSnapshot) =>
+              Post.fromDocument(documentSnapshot))
+          .toList();
+//      print(posts);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
+      body: ListView(
         children: <Widget>[
           buildProfileHeader(),
+          buildProfilePosts(),
         ],
       ),
     );
@@ -38,7 +79,7 @@ class _ProfileState extends State<Profile> {
           User user = User.fromDocument(snapshot.data);
 
           return Padding(
-            padding: const EdgeInsets.only(top: 60.0, left: 20.0),
+            padding: const EdgeInsets.only(top: 30.0, left: 20.0),
             child: Row(
               children: <Widget>[
                 Container(
@@ -126,6 +167,55 @@ class _ProfileState extends State<Profile> {
         ),
       ),
     );
+  }
+
+  buildProfilePosts() {
+    if (isLoading) {
+      return circularProgress();
+    } else if (posts.isEmpty) {
+      return Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SvgPicture.asset(
+              'asset/images/notPostt.svg',
+              height: 260.0,
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Text(
+                'No Post',
+                style: TextStyle(
+                    color: Colors.pinkAccent,
+                    fontFamily: 'Mont',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30.0),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (postOrientation == 'list') {
+      List<GridTile> gridTiles = [];
+      posts.forEach((post) {
+        gridTiles.add(GridTile(child: PostTile(post)));
+      });
+
+      return GridView.count(
+        crossAxisCount: 3,
+        childAspectRatio: 1.0,
+        mainAxisSpacing: 1.5,
+        crossAxisSpacing: 1.5,
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        children: gridTiles,
+      );
+    } else {
+      return Column(
+        children: posts,
+      );
+    }
   }
 
   handleUnFollowUsers() {}

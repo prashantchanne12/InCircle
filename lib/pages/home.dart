@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
+import 'package:in_circle/pages/activity_feed.dart';
 import 'package:in_circle/pages/chat.dart';
 import 'package:in_circle/pages/create_account.dart';
 import 'package:in_circle/pages/profile.dart';
@@ -15,9 +16,11 @@ import 'package:in_circle/pages/timeline.dart';
 import 'package:in_circle/pages/upload.dart';
 import 'package:in_circle/widgets/progress.dart';
 
+final commentsRef = Firestore.instance.collection('comments');
 final postRef = Firestore.instance.collection('posts');
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final userRef = Firestore.instance.collection('users');
+final activityFeedRef = Firestore.instance.collection('feed');
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 DateTime timestamp = DateTime.now();
 User currentUser;
@@ -125,10 +128,8 @@ class _HomeState extends State<Home> {
         ),
         selectedIndex: selectIndex,
         onSelectTab: (index) {
-          print('Index $index');
           setState(() {
             this.selectIndex = index;
-            print('SelectIndex $selectIndex');
           });
           pageController.animateToPage(selectIndex,
               duration: Duration(
@@ -150,6 +151,10 @@ class _HomeState extends State<Home> {
             label: 'Upload',
           ),
           FFNavigationBarItem(
+            iconData: Icons.favorite,
+            label: 'Likes',
+          ),
+          FFNavigationBarItem(
             iconData: Icons.account_circle,
             label: 'Profile',
           ),
@@ -162,6 +167,7 @@ class _HomeState extends State<Home> {
           UploadPost(
             user: currentUser,
           ),
+          ActivityFeed(),
           Profile(
             profileId: currentUser.id,
           ),
