@@ -7,6 +7,7 @@ import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/post.dart';
 import 'package:in_circle/widgets/post_tile.dart';
 import 'package:in_circle/widgets/progress.dart';
+import 'package:in_circle/pages/edit_profile.dart';
 
 class Profile extends StatefulWidget {
   final String profileId;
@@ -30,6 +31,42 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     getProfilePosts();
+    getFollowers();
+    getFollowing();
+    checkIfFollowing();
+  }
+
+  getFollowers() async {
+    QuerySnapshot querySnapshot = await followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .getDocuments();
+    setState(() {
+      followerCount = querySnapshot.documents.length;
+    });
+  }
+
+  getFollowing() async {
+    QuerySnapshot querySnapshot = await followingRef
+        .document(widget.profileId)
+        .collection('userFollowing')
+        .getDocuments();
+    setState(() {
+//      print('Following Count: $followingCount');
+      followingCount = querySnapshot.documents.length;
+    });
+  }
+
+  checkIfFollowing() async {
+    DocumentSnapshot documentSnapshot = await followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .document(currentUserId)
+        .get();
+
+    setState(() {
+      isFollowing = documentSnapshot.exists;
+    });
   }
 
   getProfilePosts() async {
@@ -63,6 +100,7 @@ class _ProfileState extends State<Profile> {
       body: ListView(
         children: <Widget>[
           buildProfileHeader(),
+          buildCounts(),
           buildProfilePosts(),
         ],
       ),
@@ -79,12 +117,12 @@ class _ProfileState extends State<Profile> {
           User user = User.fromDocument(snapshot.data);
 
           return Padding(
-            padding: const EdgeInsets.only(top: 30.0, left: 20.0),
+            padding: const EdgeInsets.only(top: 30.0, left: 25.0),
             child: Row(
               children: <Widget>[
                 Container(
                   child: CircleAvatar(
-                    radius: 50.0,
+                    radius: 45.0,
                     backgroundImage: NetworkImage(user.photoUrl),
                   ),
                 ),
@@ -99,7 +137,7 @@ class _ProfileState extends State<Profile> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: 'mont',
-                            fontSize: 25.0,
+                            fontSize: 20.0,
                             color: Colors.black,
                             fontWeight: FontWeight.w900),
                       ),
@@ -112,7 +150,7 @@ class _ProfileState extends State<Profile> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: 'mont',
-                            fontSize: 20.0,
+                            fontSize: 18.0,
                             color: Colors.grey,
                             fontWeight: FontWeight.w900),
                       ),
@@ -174,20 +212,21 @@ class _ProfileState extends State<Profile> {
       return circularProgress();
     } else if (posts.isEmpty) {
       return Container(
+        padding: EdgeInsets.only(top: 50.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SvgPicture.asset(
-              'asset/images/notPostt.svg',
+              'assets/images/notPost.svg',
               height: 260.0,
             ),
             Padding(
-              padding: EdgeInsets.only(top: 20.0),
+              padding: EdgeInsets.only(top: 40.0),
               child: Text(
                 'No Post',
                 style: TextStyle(
-                    color: Colors.pinkAccent,
+                    color: kPrimaryColor,
                     fontFamily: 'Mont',
                     fontWeight: FontWeight.bold,
                     fontSize: 30.0),
@@ -218,9 +257,128 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  handleUnFollowUsers() {}
+  String currentUserId = currentUser?.id;
 
-  handleFollowUsers() {}
+  handleFollowUsers() {
+    setState(() {
+      isFollowing = true;
+    });
 
-  handleEditProfile() {}
+    // Add user to that user's follower collection
+    followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .document(currentUserId)
+        .setData({});
+
+    // Update user's following collection
+    followingRef
+        .document(currentUserId)
+        .collection('userFollowing')
+        .document(widget.profileId)
+        .setData({});
+
+    // add activity feed item for that user to notify about new follower
+    activityFeedRef
+        .document(widget.profileId)
+        .collection('feedItems')
+        .document(currentUserId)
+        .setData({
+      'type': 'follow',
+      'ownerId': widget.profileId,
+      'username': currentUser.username,
+      'userId': currentUserId,
+      'userProfileImage': currentUser.photoUrl,
+      'timestamp': timestamp,
+    });
+  }
+
+  handleUnFollowUsers() {
+    setState(() {
+      isFollowing = false;
+    });
+
+    // remove user from that user's follower collection
+    followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .document(currentUserId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+
+    // remove user from following collection
+    followingRef
+        .document(currentUserId)
+        .collection('userFollowing')
+        .document(widget.profileId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+
+    // delete activity feed item for them
+    activityFeedRef
+        .document(widget.profileId)
+        .collection('feedItems')
+        .document(currentUserId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  buildCounts() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        buildCountColumns('posts', postCount),
+        buildCountColumns('followers', followerCount),
+        buildCountColumns('following', followingCount),
+      ],
+    );
+  }
+
+  buildCountColumns(String label, int count) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          count.toString(),
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'mont',
+          ),
+        ),
+        Container(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 15.0,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'mont',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  handleEditProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditProfile()),
+    );
+  }
 }

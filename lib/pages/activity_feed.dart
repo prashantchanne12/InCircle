@@ -33,7 +33,7 @@ class _ActivityFeedState extends State<ActivityFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, title: 'Feed'),
+      appBar: header(context, title: 'Activity'),
       body: Container(
         child: FutureBuilder(
             future: getActivityFeed(),
@@ -174,14 +174,14 @@ class ActivityFeedItem extends StatelessWidget {
       ),
     );
   }
+}
 
-  showProfile(BuildContext context, {String profileId}) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => Profile(
-                profileId: profileId,
-              )),
-    );
-  }
+showProfile(BuildContext context, {String profileId}) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+        builder: (context) => Profile(
+              profileId: profileId,
+            )),
+  );
 }

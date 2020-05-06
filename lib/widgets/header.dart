@@ -4,7 +4,7 @@ import 'package:in_circle/constants.dart';
 header(context, {bool isAppTitle = false, String title = 'InCircle'}) {
   return AppBar(
     automaticallyImplyLeading: false,
-    elevation: 1.0,
+    elevation: 0.0,
     centerTitle: true,
     backgroundColor: kPrimaryColor,
     title: Text(
