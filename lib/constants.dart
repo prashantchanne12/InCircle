@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 const kImage1 =
     "https://images.unsplash.com/photo-1575779861872-64e35bb59d2a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1868&q=80";
 
@@ -7,3 +9,5 @@ const kImage2 =
 const kUser =
     "https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png";
 //0e1111
+
+const kPrimaryColor = Color(0xff0984e3);

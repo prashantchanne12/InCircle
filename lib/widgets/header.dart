@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:in_circle/constants.dart';
 
 header(context, {bool isAppTitle = false, String title = 'InCircle'}) {
   return AppBar(
     automaticallyImplyLeading: false,
     elevation: 1.0,
     centerTitle: true,
-    backgroundColor: Colors.black87,
+    backgroundColor: kPrimaryColor,
     title: Text(
       isAppTitle ? 'InCircle' : title,
       overflow: TextOverflow.ellipsis,

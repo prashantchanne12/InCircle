@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as im;
+import 'package:in_circle/constants.dart';
 import 'package:in_circle/pages/home.dart';
-import 'package:in_circle/widgets/header.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -44,20 +44,54 @@ class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       key: _scaffoldKey,
-      appBar: header(context, title: 'Set up your Account'),
       body: ListView(
         children: <Widget>[
           isUpload ? linearProgress() : Text(''),
-          Padding(
-            padding: EdgeInsets.only(top: 25.0),
-            child: Column(
-              children: <Widget>[
-                buildCircleAvatar(),
-                buildUsernameField(),
-                buildDisplayNameField(),
-                buildSubmitButton(),
-              ],
+          Column(
+            children: <Widget>[
+              buildHeader(),
+              buildCircleAvatar(),
+              buildUsernameField(),
+              buildDisplayNameField(),
+              buildSubmitButton(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20.0, bottom: 10.0, top: 20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Set up your',
+              style: TextStyle(
+                color: kPrimaryColor,
+                fontFamily: 'mont',
+                fontSize: 32.0,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Profile',
+              style: TextStyle(
+                color: kPrimaryColor,
+                fontFamily: 'mont',
+                fontSize: 32.0,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -74,7 +108,7 @@ class _CreateAccountState extends State<CreateAccount> {
           ? CircleAvatar(
               child: Icon(
                 Icons.camera_alt,
-                color: Colors.black54,
+                color: Colors.black,
               ),
               radius: 60.0,
               backgroundImage: FileImage(file),
@@ -82,7 +116,7 @@ class _CreateAccountState extends State<CreateAccount> {
           : CircleAvatar(
               child: Icon(
                 Icons.camera_alt,
-                color: Colors.black54,
+                color: Colors.black,
               ),
               radius: 60.0,
               backgroundColor: Colors.grey,
@@ -101,7 +135,10 @@ class _CreateAccountState extends State<CreateAccount> {
             child: Text(
               'Create username',
               style: TextStyle(
-                  fontFamily: 'mont', fontSize: 18.0, color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'mont',
+                  fontSize: 18.0,
+                  color: kPrimaryColor),
               textAlign: TextAlign.left,
             ),
           ),
@@ -134,7 +171,10 @@ class _CreateAccountState extends State<CreateAccount> {
             child: Text(
               'Display Name',
               style: TextStyle(
-                  fontFamily: 'mont', fontSize: 18.0, color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'mont',
+                  fontSize: 18.0,
+                  color: kPrimaryColor),
               textAlign: TextAlign.left,
             ),
           ),
@@ -173,7 +213,7 @@ class _CreateAccountState extends State<CreateAccount> {
         width: 350.0,
         child: Material(
           borderRadius: BorderRadius.circular(9.0),
-          color: Colors.black87,
+          color: kPrimaryColor,
           child: InkWell(
             onTap: () {
               updateProfileData();

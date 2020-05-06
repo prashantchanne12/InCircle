@@ -1,11 +1,21 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
+import 'package:in_circle/pages/chat.dart';
 import 'package:in_circle/pages/create_account.dart';
+import 'package:in_circle/pages/profile.dart';
+import 'package:in_circle/pages/timeline.dart';
+import 'package:in_circle/pages/upload.dart';
 import 'package:in_circle/widgets/progress.dart';
 
+final postRef = Firestore.instance.collection('posts');
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final userRef = Firestore.instance.collection('users');
 final StorageReference storageRef = FirebaseStorage.instance.ref();
@@ -20,10 +30,15 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isLogin = false;
   bool isLoading = false;
+  var phones = [];
+  int selectIndex = 0;
+  PageController pageController;
 
   @override
   void initState() {
     super.initState();
+
+    pageController = PageController();
 
     // Google Sign in Listener
     googleSignIn.onCurrentUserChanged.listen((account) {
@@ -100,13 +115,58 @@ class _HomeState extends State<Home> {
 
   buildHomePage() {
     return Scaffold(
-      body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            logout();
-          },
-          child: Text('Log out!!'),
+      bottomNavigationBar: FFNavigationBar(
+        theme: FFNavigationBarTheme(
+          barBackgroundColor: Colors.white,
+          selectedItemBackgroundColor: kPrimaryColor,
+          selectedItemIconColor: Colors.white,
+          selectedItemLabelColor: Colors.black,
+          selectedItemBorderColor: Colors.white,
         ),
+        selectedIndex: selectIndex,
+        onSelectTab: (index) {
+          print('Index $index');
+          setState(() {
+            this.selectIndex = index;
+            print('SelectIndex $selectIndex');
+          });
+          pageController.animateToPage(selectIndex,
+              duration: Duration(
+                milliseconds: 200,
+              ),
+              curve: Curves.easeInOut);
+        },
+        items: [
+          FFNavigationBarItem(
+            iconData: Icons.home,
+            label: 'Feed',
+          ),
+          FFNavigationBarItem(
+            iconData: Icons.message,
+            label: 'Chats',
+          ),
+          FFNavigationBarItem(
+            iconData: Icons.add_box,
+            label: 'Upload',
+          ),
+          FFNavigationBarItem(
+            iconData: Icons.account_circle,
+            label: 'Profile',
+          ),
+        ],
+      ),
+      body: PageView(
+        children: <Widget>[
+          Timeline(),
+          ChatScreen(),
+          UploadPost(
+            user: currentUser,
+          ),
+          Profile(
+            profileId: currentUser.id,
+          ),
+        ],
+        controller: pageController,
       ),
     );
   }
