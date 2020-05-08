@@ -31,6 +31,63 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController searchController = TextEditingController();
   Future<QuerySnapshot> searchResultsFuture;
   String chatId = '';
+  bool getData = false;
+  User chatUser;
+  bool user1 = false;
+  bool user2 = false;
+
+  @override
+  void initState() {
+    super.initState();
+    userRef
+        .document(widget.profileId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      print('Reciber info called');
+      User sender = User.fromDocument(documentSnapshot);
+      setState(() {
+        chatUser = sender;
+      });
+    });
+
+    _firestore
+        .collection('chat_tiles')
+        .document(currentUser.id)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      print('user 1');
+      if (!documentSnapshot.exists) {
+        setState(() {
+          user1 = false;
+        });
+      } else {
+        setState(() {
+          user1 = true;
+        });
+      }
+    });
+
+    _firestore
+        .collection('chat_tiles')
+        .document(widget.profileId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      print('user 2');
+      if (!documentSnapshot.exists) {
+        setState(() {
+          user2 = false;
+        });
+      } else {
+        setState(() {
+          user2 = true;
+        });
+      }
+    });
+
+    setState(() {
+      getData = user1 && user2;
+    });
+  }
 
   buildSearchBar() {
     return AppBar(
@@ -100,14 +157,31 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  bool getData = true;
-  User chatUser;
-  getReceiverInfo() async {
-    DocumentSnapshot documentSnapshot =
-        await userRef.document(widget.profileId).get();
-    User sender = User.fromDocument(documentSnapshot);
+//  User chatUser;
+//  getReceiverInfo() async {
+//    print('getReciverInfo Called');
+//    DocumentSnapshot documentSnapshot =
+//        await userRef.document(widget.profileId).get();
+//    User sender = User.fromDocument(documentSnapshot);
+//    setState(() {
+//      chatUser = sender;
+//    });
+//  }
+
+  getChatTilesInfo() async {
+    print('getChatTilesInfo Called');
+    DocumentSnapshot documentUser = await _firestore
+        .collection('chat_tiles')
+        .document(currentUser.id)
+        .get();
+
+    DocumentSnapshot documentSender = await _firestore
+        .collection('chat_tiles')
+        .document(widget.profileId)
+        .get();
+
     setState(() {
-      chatUser = sender;
+      getData = documentUser.exists && documentSender.exists;
     });
   }
 
@@ -150,20 +224,9 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               FlatButton(
                 onPressed: () async {
-                  await getReceiverInfo();
                   messageTextController.clear();
 
-                  DocumentSnapshot documentUser = await _firestore
-                      .collection('chat_tiles')
-                      .document(currentUser.id)
-                      .get();
-
-                  DocumentSnapshot documentSender = await _firestore
-                      .collection('chat_tiles')
-                      .document(widget.profileId)
-                      .get();
-
-                  if (documentSender.exists && documentUser.exists) {
+                  if (getData) {
                     _firestore
                         .collection('messages')
                         .document(chatId)
@@ -206,6 +269,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       'text': messageText,
                       'userId': currentUser.id,
                       'time': FieldValue.serverTimestamp(),
+                    });
+
+                    setState(() {
+                      getData = true;
                     });
                   }
                 },
