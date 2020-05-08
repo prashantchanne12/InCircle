@@ -15,6 +15,7 @@ import 'package:in_circle/pages/create_account.dart';
 import 'package:in_circle/pages/profile.dart';
 import 'package:in_circle/pages/timeline.dart';
 import 'package:in_circle/pages/upload.dart';
+import 'package:in_circle/widgets/chat_tiles.dart';
 import 'package:in_circle/widgets/progress.dart';
 
 final commentsRef = Firestore.instance.collection('comments');
@@ -25,6 +26,7 @@ final activityFeedRef = Firestore.instance.collection('feed');
 final followersRef = Firestore.instance.collection('followers');
 final followingRef = Firestore.instance.collection('following');
 final timelineRef = Firestore.instance.collection('timeline');
+final chatTilesRef = Firestore.instance.collection('chat_tiles');
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 DateTime timestamp = DateTime.now();
 User currentUser;
@@ -224,7 +226,8 @@ class _HomeState extends State<Home> {
           Timeline(
             user: currentUser,
           ),
-          ChatScreen(),
+          ChatTiles(),
+//          ChatScreen(),
           UploadPost(
             user: currentUser,
           ),

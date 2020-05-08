@@ -3,7 +3,6 @@ import 'package:in_circle/constants.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:in_circle/widgets/post.dart';
-import 'package:in_circle/widgets/header.dart';
 
 class PostScreen extends StatelessWidget {
   final String userId;
@@ -32,7 +31,7 @@ class PostScreen extends StatelessWidget {
               automaticallyImplyLeading: false,
               backgroundColor: Colors.white,
               title: Text(
-                'You Posted',
+                userId == currentUser.id ? 'You Posted' : 'InCircle',
                 style: TextStyle(
                   color: kPrimaryColor,
                   fontWeight: FontWeight.w900,

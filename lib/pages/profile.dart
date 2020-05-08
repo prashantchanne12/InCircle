@@ -11,6 +11,7 @@ import 'package:in_circle/widgets/post_tile.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:in_circle/pages/edit_profile.dart';
 import 'package:in_circle/widgets/post_profile.dart';
+import 'package:in_circle/pages/chat.dart';
 
 class Profile extends StatefulWidget {
   final String profileId;
@@ -128,6 +129,8 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  User user;
+
 //  buildProfilePosts()
   buildProfileHeader() {
     return StreamBuilder(
@@ -136,7 +139,7 @@ class _ProfileState extends State<Profile> {
         if (!snapshot.hasData) {
           return circularProgress();
         } else {
-          User user = User.fromDocument(snapshot.data);
+          user = User.fromDocument(snapshot.data);
 
           return Padding(
             padding: const EdgeInsets.only(top: 30.0, left: 25.0),
@@ -198,7 +201,16 @@ class _ProfileState extends State<Profile> {
       padding: const EdgeInsets.only(top: 10.0),
       child: GestureDetector(
         onTap: () {
-          print('show chat');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                profileId: widget.profileId,
+                username: user.username,
+                photoUrl: user.photoUrl,
+              ),
+            ),
+          );
         },
         child: Container(
           width: 45.0,

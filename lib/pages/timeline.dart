@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/post.dart';
@@ -73,6 +74,32 @@ class _TimelineState extends State<Timeline> {
     );
   }
 
+  buildNoContent() {
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    return Container(
+      child: Center(
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            SvgPicture.asset(
+              'assets/images/search.svg',
+              height: orientation == Orientation.portrait ? 300.0 : 200,
+            ),
+            Text(
+              'Find Users To Chat',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: kPrimaryColor,
+                  fontFamily: 'mont',
+                  fontSize: 35.0,
+                  fontWeight: FontWeight.w600),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,10 +117,12 @@ class _TimelineState extends State<Timeline> {
         ),
         elevation: 0.0,
       ),
-      body: RefreshIndicator(
-        onRefresh: () => getTimeline(),
-        child: buildTimeline(),
-      ),
+      body: posts == null
+          ? buildNoContent()
+          : RefreshIndicator(
+              onRefresh: () => getTimeline(),
+              child: buildTimeline(),
+            ),
     );
   }
 }
