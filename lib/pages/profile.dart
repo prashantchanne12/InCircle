@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/home.dart';
+import 'package:in_circle/pages/post_screen.dart';
 import 'package:in_circle/widgets/post.dart';
 import 'package:in_circle/widgets/post_tile.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:in_circle/pages/edit_profile.dart';
+import 'package:in_circle/widgets/post_profile.dart';
 
 class Profile extends StatefulWidget {
   final String profileId;
@@ -25,7 +28,8 @@ class _ProfileState extends State<Profile> {
   int postCount = 0;
   int followerCount = 0;
   int followingCount = 0;
-  List<Post> posts = [];
+  List<PostProfile> posts = [];
+  List<Post> postGrid = [];
 
   @override
   void initState() {
@@ -87,9 +91,14 @@ class _ProfileState extends State<Profile> {
       // posts - list containing objects of Post class
       posts = querySnapshot.documents
           .map((DocumentSnapshot documentSnapshot) =>
-              Post.fromDocument(documentSnapshot))
+              PostProfile.fromDocument(documentSnapshot))
           .toList();
 //      print(posts);
+
+      postGrid = querySnapshot.documents
+          .map((DocumentSnapshot documentSnapshot) =>
+              Post.fromDocument(documentSnapshot))
+          .toList();
     });
   }
 
@@ -97,16 +106,29 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: ListView(
+      body: Column(
         children: <Widget>[
-          buildProfileHeader(),
-          buildCounts(),
-          buildProfilePosts(),
+          Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: buildProfileHeader(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 15.0),
+            child: buildCounts(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 0.0),
+            child: buildTogglePostOrientation(),
+          ),
+          Expanded(
+            child: buildProfilePosts(),
+          )
         ],
       ),
     );
   }
 
+//  buildProfilePosts()
   buildProfileHeader() {
     return StreamBuilder(
       stream: userRef.document(widget.profileId).snapshots(),
@@ -155,7 +177,12 @@ class _ProfileState extends State<Profile> {
                             fontWeight: FontWeight.w900),
                       ),
                     ),
-                    buildProfileButton(),
+                    Row(
+                      children: <Widget>[
+                        buildProfileButton(),
+                        isFollowing ? buildMessageButton() : Text(''),
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -163,6 +190,31 @@ class _ProfileState extends State<Profile> {
           );
         }
       },
+    );
+  }
+
+  buildMessageButton() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          print('show chat');
+        },
+        child: Container(
+          width: 45.0,
+          height: 45.0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+          child: Icon(
+            Icons.mail,
+            size: 20.0,
+            color: kPrimaryColor,
+          ),
+        ),
+      ),
     );
   }
 
@@ -183,14 +235,14 @@ class _ProfileState extends State<Profile> {
       child: FlatButton(
         onPressed: function,
         child: Container(
-          width: 160.0,
-          height: 40.0,
+          width: 130.0,
+          height: 35.0,
           child: Text(
             text,
             style: TextStyle(
               color: isFollowing ? Colors.black : Colors.white,
               fontFamily: 'mont',
-              fontSize: 17.0,
+              fontSize: 16.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -235,9 +287,9 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       );
-    } else if (postOrientation == 'list') {
+    } else if (postOrientation == 'grid') {
       List<GridTile> gridTiles = [];
-      posts.forEach((post) {
+      postGrid.forEach((post) {
         gridTiles.add(GridTile(child: PostTile(post)));
       });
 
@@ -251,8 +303,40 @@ class _ProfileState extends State<Profile> {
         children: gridTiles,
       );
     } else {
-      return Column(
-        children: posts,
+//      return Column(
+//        children: posts,
+//        );
+      int indexCount = 0;
+      print(posts.length);
+      print(posts[1]);
+      return StaggeredGridView.countBuilder(
+        shrinkWrap: true,
+        crossAxisCount: 4,
+        padding: EdgeInsets.all(5.0),
+//        shrinkWrap: true,
+        itemCount: posts.length,
+        itemBuilder: (BuildContext context, int index) {
+          print(indexCount);
+          return GestureDetector(
+            onTap: () {
+              showPost(context, posts[index].postId, posts[index].ownerId);
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+              child: posts[index],
+            ),
+          );
+        },
+        staggeredTileBuilder: (int index) {
+          indexCount = index + 1;
+//          print(indexCount);
+          return indexCount % 3 != 0
+              ? StaggeredTile.count(2, 2)
+              : StaggeredTile.count(4, 3);
+        },
+        mainAxisSpacing: 0.0,
+        crossAxisSpacing: 0.0,
       );
     }
   }
@@ -290,6 +374,11 @@ class _ProfileState extends State<Profile> {
       'userId': currentUserId,
       'userProfileImage': currentUser.photoUrl,
       'timestamp': timestamp,
+    });
+    setState(() {
+      getFollowing();
+      getFollowers();
+      checkIfFollowing();
     });
   }
 
@@ -333,16 +422,21 @@ class _ProfileState extends State<Profile> {
         doc.reference.delete();
       }
     });
+
+    setState(() {
+      getFollowing();
+      getFollowers();
+      checkIfFollowing();
+    });
   }
 
   buildCounts() {
     return Row(
-      mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        buildCountColumns('posts', postCount),
-        buildCountColumns('followers', followerCount),
-        buildCountColumns('following', followingCount),
+        buildCountColumns('Posts', postCount),
+        buildCountColumns('Followers', followerCount),
+        buildCountColumns('Following', followingCount),
       ],
     );
   }
@@ -355,7 +449,7 @@ class _ProfileState extends State<Profile> {
         Text(
           count.toString(),
           style: TextStyle(
-            fontSize: 20.0,
+            fontSize: 22.0,
             fontWeight: FontWeight.bold,
             fontFamily: 'mont',
           ),
@@ -364,7 +458,7 @@ class _ProfileState extends State<Profile> {
           child: Text(
             label,
             style: TextStyle(
-              color: Colors.grey,
+              color: Colors.black54,
               fontSize: 15.0,
               fontWeight: FontWeight.w400,
               fontFamily: 'mont',
@@ -375,10 +469,51 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  setPostOrientation(String postOrientation) {
+    setState(() {
+      this.postOrientation = postOrientation;
+    });
+  }
+
+  buildTogglePostOrientation() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        IconButton(
+          onPressed: () => setPostOrientation('grid'),
+          icon: Icon(
+            Icons.grid_on,
+            color: postOrientation == 'grid' ? kPrimaryColor : Colors.grey,
+          ),
+        ),
+        IconButton(
+          onPressed: () => setPostOrientation('list'),
+          icon: Icon(
+            Icons.list,
+            color: postOrientation == 'list' ? kPrimaryColor : Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  showPost(context, postId, ownerId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostScreen(
+          postId: postId,
+          userId: ownerId,
+        ),
+      ),
+    );
+  }
+
   handleEditProfile() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EditProfile()),
+      MaterialPageRoute(
+          builder: (context) => EditProfile(currentUserId: currentUserId)),
     );
   }
 }

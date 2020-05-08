@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:in_circle/constants.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/header.dart';
 import 'package:in_circle/widgets/progress.dart';
@@ -87,7 +88,20 @@ class _CommentsState extends State<Comments> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, title: 'Comments'),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0.0,
+        title: Text(
+          'Comments',
+          style: TextStyle(
+            color: kPrimaryColor,
+            fontSize: 22.0,
+            fontFamily: 'mont',
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        backgroundColor: Colors.white,
+      ),
       body: Column(
         children: <Widget>[
           Expanded(
@@ -157,7 +171,9 @@ class Comment extends StatelessWidget {
           ),
           subtitle: Text(timeago.format(timestamp.toDate())),
         ),
-        Divider()
+        Divider(
+          height: 1.0,
+        )
       ],
     );
   }

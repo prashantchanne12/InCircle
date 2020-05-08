@@ -188,10 +188,8 @@ class _HomeState extends State<Home> {
         selectedIndex: selectIndex,
         onSelectTab: (index) {
           setState(() {
-            print('index $index');
             this.selectIndex = index;
           });
-          print('select index $selectIndex');
           pageController.animateToPage(selectIndex,
               duration: Duration(
                 milliseconds: 200,

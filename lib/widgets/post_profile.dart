@@ -11,7 +11,7 @@ import 'package:in_circle/pages/home.dart';
 import 'custom_image.dart';
 import 'progress.dart';
 
-class Post extends StatefulWidget {
+class PostProfile extends StatefulWidget {
   final String postId;
   final String ownerId; // owner of the post
   final String username;
@@ -20,7 +20,7 @@ class Post extends StatefulWidget {
   final String mediaUrl;
   final dynamic likes;
 
-  Post({
+  PostProfile({
     this.postId,
     this.ownerId,
     this.username,
@@ -30,8 +30,8 @@ class Post extends StatefulWidget {
     this.likes,
   });
 
-  factory Post.fromDocument(DocumentSnapshot documentSnapshot) {
-    return Post(
+  factory PostProfile.fromDocument(DocumentSnapshot documentSnapshot) {
+    return PostProfile(
       postId: documentSnapshot['postId'],
       ownerId: documentSnapshot['ownerId'],
       username: documentSnapshot['username'],
@@ -58,7 +58,7 @@ class Post extends StatefulWidget {
   }
 
   @override
-  _PostState createState() => _PostState(
+  _PostProfileState createState() => _PostProfileState(
       postId: this.postId,
       ownerId: this.ownerId,
       username: this.username,
@@ -69,7 +69,7 @@ class Post extends StatefulWidget {
       likeCount: this.getLikeCount(this.likes));
 }
 
-class _PostState extends State<Post> {
+class _PostProfileState extends State<PostProfile> {
   final String currentUserId = currentUser?.id;
   final String postId;
   final String ownerId;
@@ -82,7 +82,7 @@ class _PostState extends State<Post> {
   Map likes;
   bool isLiked;
 
-  _PostState(
+  _PostProfileState(
       {this.postId,
       this.ownerId,
       this.username,
@@ -96,19 +96,8 @@ class _PostState extends State<Post> {
   Widget build(BuildContext context) {
     isLiked = (likes[currentUserId] == true);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        buildPostHeader(),
-        Padding(
-          padding: EdgeInsets.all(5.0),
-          child: buildPostImage(),
-        ),
-        buildPostFooter(),
-        SizedBox(
-          height: 15.0,
-        ),
-      ],
+    return Container(
+      child: buildPostImage(),
     );
   }
 

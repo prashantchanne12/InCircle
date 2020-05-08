@@ -23,6 +23,7 @@ class PostScreen extends StatelessWidget {
           return circularProgress();
         }
         Post post = Post.fromDocument(snapshot.data);
+        print('In post screen $postId anf $post');
         return Center(
           child: Scaffold(
             appBar: header(

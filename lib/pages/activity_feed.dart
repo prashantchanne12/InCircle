@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/pages/post_screen.dart';
 import 'package:in_circle/pages/profile.dart';
-import 'package:in_circle/widgets/header.dart';
+import 'package:in_circle/constants.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -33,7 +33,20 @@ class _ActivityFeedState extends State<ActivityFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, title: 'Activity'),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+        title: Text(
+          'Activity',
+          style: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'mont',
+            fontWeight: FontWeight.bold,
+            fontSize: 22.0,
+          ),
+        ),
+      ),
       body: Container(
         child: FutureBuilder(
             future: getActivityFeed(),
@@ -88,6 +101,7 @@ class ActivityFeedItem extends StatelessWidget {
   }
 
   showPost(context) {
+    print(postId);
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -137,40 +151,51 @@ class ActivityFeedItem extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.only(bottom: 2.0),
-      child: Container(
-        color: Colors.white54,
-        child: ListTile(
-          title: GestureDetector(
-            onTap: () => showProfile(context, profileId: userId),
-            child: RichText(
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.black,
-                  fontFamily: 'mont',
+      child: Column(
+        children: <Widget>[
+          Container(
+            color: Colors.white54,
+            child: ListTile(
+              title: GestureDetector(
+                onTap: () => showProfile(context, profileId: userId),
+                child: RichText(
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.black,
+                      fontFamily: 'mont',
+                    ),
+                    children: [
+                      TextSpan(
+                        text: username,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: ' $activityItemText',
+                      ),
+                    ],
+                  ),
                 ),
-                children: [
-                  TextSpan(
-                    text: username,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(
-                    text: ' $activityItemText',
-                  ),
-                ],
               ),
+              leading: GestureDetector(
+                onTap: () => showProfile(context, profileId: userId),
+                child: CircleAvatar(
+                  backgroundImage: CachedNetworkImageProvider(userProfileImage),
+                ),
+              ),
+              subtitle: Text(
+                timeago.format(timestamp.toDate()),
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: mediaPreview,
             ),
           ),
-          leading: CircleAvatar(
-            backgroundImage: CachedNetworkImageProvider(userProfileImage),
+          Divider(
+            color: Colors.blueGrey,
+            height: 1.0,
           ),
-          subtitle: Text(
-            timeago.format(timestamp.toDate()),
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: mediaPreview,
-        ),
+        ],
       ),
     );
   }

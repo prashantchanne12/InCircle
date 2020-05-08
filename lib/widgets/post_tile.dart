@@ -25,7 +25,12 @@ class PostTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => showPost(context),
-      child: cachedNetworkImage(post.mediaUrl),
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: ClipRRect(
+            borderRadius: BorderRadius.circular(5.0),
+            child: cachedNetworkImage(post.mediaUrl)),
+      ),
     );
   }
 }

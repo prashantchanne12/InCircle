@@ -6,6 +6,7 @@ import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/post.dart';
 import 'package:in_circle/widgets/progress.dart';
+import 'package:in_circle/constants.dart';
 
 class Timeline extends StatefulWidget {
   final User user;
@@ -74,9 +75,24 @@ class _TimelineState extends State<Timeline> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () => getTimeline(),
-      child: buildTimeline(),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text(
+          'InCircle',
+          style: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'mont',
+            fontSize: 22.0,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        elevation: 0.0,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => getTimeline(),
+        child: buildTimeline(),
+      ),
     );
   }
 }
