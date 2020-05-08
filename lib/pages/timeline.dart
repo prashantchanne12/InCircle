@@ -77,6 +77,7 @@ class _TimelineState extends State<Timeline> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Text(
           'InCircle',

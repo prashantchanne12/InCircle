@@ -5,9 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:in_circle/model/user.dart';
+import 'package:in_circle/pages/activity_feed.dart';
 import 'package:in_circle/pages/comments.dart';
 import 'package:in_circle/pages/home.dart';
-
+import 'package:timeago/timeago.dart' as timeago;
 import 'custom_image.dart';
 import 'progress.dart';
 
@@ -19,6 +20,7 @@ class Post extends StatefulWidget {
   final String desc;
   final String mediaUrl;
   final dynamic likes;
+  final Timestamp timestamp;
 
   Post({
     this.postId,
@@ -28,6 +30,7 @@ class Post extends StatefulWidget {
     this.desc,
     this.mediaUrl,
     this.likes,
+    this.timestamp,
   });
 
   factory Post.fromDocument(DocumentSnapshot documentSnapshot) {
@@ -39,6 +42,7 @@ class Post extends StatefulWidget {
       desc: documentSnapshot['desc'],
       mediaUrl: documentSnapshot['mediaUrl'],
       likes: documentSnapshot['likes'],
+      timestamp: documentSnapshot['timestamp'],
     );
   }
 
@@ -59,14 +63,16 @@ class Post extends StatefulWidget {
 
   @override
   _PostState createState() => _PostState(
-      postId: this.postId,
-      ownerId: this.ownerId,
-      username: this.username,
-      location: this.location,
-      desc: this.desc,
-      mediaUrl: this.mediaUrl,
-      likes: this.likes,
-      likeCount: this.getLikeCount(this.likes));
+        postId: this.postId,
+        ownerId: this.ownerId,
+        username: this.username,
+        location: this.location,
+        desc: this.desc,
+        mediaUrl: this.mediaUrl,
+        likes: this.likes,
+        likeCount: this.getLikeCount(this.likes),
+        timestamp: this.timestamp,
+      );
 }
 
 class _PostState extends State<Post> {
@@ -77,20 +83,23 @@ class _PostState extends State<Post> {
   final String location;
   final String desc;
   final String mediaUrl;
+  final Timestamp timestamp;
   bool showHeart = false;
   int likeCount;
   Map likes;
   bool isLiked;
 
-  _PostState(
-      {this.postId,
-      this.ownerId,
-      this.username,
-      this.location,
-      this.desc,
-      this.mediaUrl,
-      this.likes,
-      this.likeCount});
+  _PostState({
+    this.postId,
+    this.ownerId,
+    this.username,
+    this.location,
+    this.desc,
+    this.mediaUrl,
+    this.likes,
+    this.likeCount,
+    this.timestamp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +136,7 @@ class _PostState extends State<Post> {
               backgroundColor: Colors.grey,
             ),
             title: GestureDetector(
-              onTap: () => print(
-                  'Show Profile'), //showProfile(context, profileId: user.id)
+              onTap: () => showProfile(context, profileId: user.id),
               child: Text(
                 user.username,
                 style: TextStyle(
@@ -398,13 +406,16 @@ class _PostState extends State<Post> {
             Container(
               margin: EdgeInsets.only(left: 20.0),
               child: Text(
-                '$username',
+                '$username ',
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'mont',
                 ),
               ),
+            ),
+            SizedBox(
+              width: 5.0,
             ),
             Expanded(
               child: Text(
@@ -415,6 +426,17 @@ class _PostState extends State<Post> {
               ),
             ),
           ],
+        ),
+        Container(
+          padding: EdgeInsets.only(left: 20.0),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            timeago.format(timestamp.toDate()),
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontFamily: 'mont',
+            ),
+          ),
         ),
       ],
     );

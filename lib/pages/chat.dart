@@ -20,6 +20,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   buildSearchBar() {
     return AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: TextFormField(
           controller: searchController,

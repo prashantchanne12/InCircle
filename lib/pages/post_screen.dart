@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:in_circle/constants.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:in_circle/widgets/post.dart';
@@ -23,17 +24,30 @@ class PostScreen extends StatelessWidget {
           return circularProgress();
         }
         Post post = Post.fromDocument(snapshot.data);
-        print('In post screen $postId anf $post');
+//        print('In post screen $postId anf $post');
         return Center(
           child: Scaffold(
-            appBar: header(
-              context,
-              title: post.desc,
+            appBar: AppBar(
+              elevation: 0.0,
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              title: Text(
+                'You Posted',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22.0,
+                  fontFamily: 'mont',
+                ),
+              ),
             ),
             body: ListView(
               children: <Widget>[
                 Container(
                   child: post,
+                ),
+                SizedBox(
+                  height: 10.0,
                 ),
               ],
             ),

@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
       print('Error in Sigining In..');
     });
 
-    // Re-authenticate user when app is reopened
+    // Re-authenticate user when ba is reopened
     googleSignIn.signInSilently(suppressErrors: false).then((value) {
       handleSignIn(value);
     }).catchError((error) {

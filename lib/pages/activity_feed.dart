@@ -36,6 +36,7 @@ class _ActivityFeedState extends State<ActivityFeed> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0.0,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Text(
           'Activity',
@@ -100,22 +101,11 @@ class ActivityFeedItem extends StatelessWidget {
     );
   }
 
-  showPost(context) {
-    print(postId);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PostScreen(
-                  postId: postId,
-                  userId: userId,
-                )));
-  }
-
   configureMediaPreview(context) {
 //    print('\n Median Url 2 $mediaUrl');
     if (type == 'like' || type == 'comment') {
       mediaPreview = GestureDetector(
-        onTap: () => showPost(context),
+        onTap: () => showPost(context, currentUser.id, postId),
         child: Container(
           height: 50.0,
           width: 50.0,
@@ -198,6 +188,17 @@ class ActivityFeedItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  showPost(context, userId, postId) {
+//    print('In showPost $postId and userId $userId');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PostScreen(
+                  postId: postId,
+                  userId: userId,
+                )));
   }
 }
 

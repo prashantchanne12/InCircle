@@ -308,7 +308,7 @@ class _ProfileState extends State<Profile> {
 //        );
       int indexCount = 0;
       print(posts.length);
-      print(posts[1]);
+//      print(posts[1]);
       return StaggeredGridView.countBuilder(
         shrinkWrap: true,
         crossAxisCount: 4,
