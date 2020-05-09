@@ -261,4 +261,3 @@ exports.onCreateActivityFeedItem = functions.firestore
     }
   });
 
-// ---------- OnCreate Message ------------

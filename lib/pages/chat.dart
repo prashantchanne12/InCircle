@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_circle/constants.dart';
@@ -35,6 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
   User chatUser;
   bool user1 = false;
   bool user2 = false;
+  bool isSeen = false;
 
   @override
   void initState() {
@@ -86,6 +88,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
     setState(() {
       getData = user1 && user2;
+    });
+
+    setState(() {
+      isSeen = true;
     });
   }
 
@@ -234,6 +240,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         .add({
                       'text': messageText,
                       'userId': currentUser.id,
+                      'receiverId': widget.profileId,
+                      'isSeen': false,
                       'time': FieldValue.serverTimestamp(),
                     });
                   } else {
@@ -268,6 +276,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         .add({
                       'text': messageText,
                       'userId': currentUser.id,
+                      'receiverId': widget.profileId,
+                      'isSeen': false,
                       'time': FieldValue.serverTimestamp(),
                     });
 
@@ -318,19 +328,34 @@ class MessagesStream extends StatelessWidget {
         if (!snapshot.hasData) {
           return circularProgress();
         } else {
-          final messages = snapshot.data.documents;
+          snapshot.data.documents.forEach((DocumentSnapshot documentSnapshot) {
+            final messageReceiver = documentSnapshot.data['receiverId'];
+            if (messageReceiver == currentUser.id) {
+              _firestore
+                  .collection('messages')
+                  .document(chatId)
+                  .collection('chats')
+                  .document(documentSnapshot.documentID)
+                  .updateData({
+                'isSeen': true,
+              });
+            }
+          });
 
-          for (var message in messages) {
-            final messageText = message.data['text'];
-            final messageSender = message.data['userId'];
+          snapshot.data.documents.forEach((DocumentSnapshot documentSnapshot) {
+            final messageText = documentSnapshot.data['text'];
+            final messageSender = documentSnapshot.data['userId'];
+            final messageReceiver = documentSnapshot.data['receiverId'];
+            final isSeen = documentSnapshot.data['isSeen'];
 
             final messageBubble = MessageBubble(
-              text: messageText,
-              sender: messageSender,
-              isMe: currentUser.id == messageSender,
-            );
+                text: messageText,
+                sender: messageSender,
+                isMe: currentUser.id == messageSender,
+                isReceiver: messageReceiver == currentUser.id,
+                isSeen: isSeen);
             messageBubbles.add(messageBubble);
-          }
+          });
         }
 
         return Expanded(
@@ -351,9 +376,15 @@ class MessageBubble extends StatelessWidget {
   final String sender;
   final String text;
   final bool isMe;
+  final bool isReceiver;
+  final bool isSeen;
 
   MessageBubble(
-      {@required this.sender, @required this.text, @required this.isMe});
+      {@required this.sender,
+      @required this.text,
+      @required this.isMe,
+      @required this.isReceiver,
+      @required this.isSeen});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -387,6 +418,17 @@ class MessageBubble extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          Container(
+            padding: EdgeInsets.only(right: 5.0),
+            child: isSeen && isMe
+                ? Text(
+                    'seen',
+                    style: TextStyle(
+                      fontFamily: 'mont',
+                    ),
+                  )
+                : null,
           ),
         ],
       ),
