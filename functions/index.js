@@ -261,3 +261,43 @@ exports.onCreateActivityFeedItem = functions.firestore
     }
   });
 
+// ---------- onCreate Message ------------
+
+exports.onCreateMessage = functions.firestore
+    .document("/messages/{chatId}/chats/{docId}")
+    .onCreate(async (snapshot, context) => {
+
+        const chatId = context.params.chatId;
+        const docId = context.params.docId;
+
+
+        const userMessages = admin.firestore()
+                        .collection('messages')
+                        .doc(chatId)
+                        .collection('chats')
+                        .where('isSeen', '==', true);
+
+
+        const querySnapshot = await userMessages.get();
+
+
+        querySnapshot.forEach((doc) => {
+
+//            followerId = doc.id;
+
+            admin
+                .firestore()
+                .collection('messages')
+                .doc(chatId)
+                .collection('chats')
+                .doc(doc.id)
+                .get().then(doc => {
+
+                    if(doc.exists){
+                    setTimeout(doc.ref.delete(),25000);
+                    }
+
+                });
+        });
+});
+
