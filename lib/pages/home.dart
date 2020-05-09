@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +11,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/activity_feed.dart';
-import 'package:in_circle/pages/chat.dart';
 import 'package:in_circle/pages/create_account.dart';
 import 'package:in_circle/pages/profile.dart';
 import 'package:in_circle/pages/timeline.dart';
@@ -28,6 +28,7 @@ final followingRef = Firestore.instance.collection('following');
 final timelineRef = Firestore.instance.collection('timeline');
 final chatTilesRef = Firestore.instance.collection('chat_tiles');
 final StorageReference storageRef = FirebaseStorage.instance.ref();
+final FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
 DateTime timestamp = DateTime.now();
 User currentUser;
 
@@ -124,6 +125,7 @@ class _HomeState extends State<Home> {
   @override
   void dispose() {
     super.dispose();
+    makeUserOffline();
     pageController.dispose();
   }
 
@@ -165,6 +167,7 @@ class _HomeState extends State<Home> {
       documentSnapshot = await userRef.document(user.id).get();
     }
     currentUser = User.fromDocument(documentSnapshot);
+    makeUserOnline();
 //    print(currentUser.displayName);
   }
 
@@ -173,6 +176,7 @@ class _HomeState extends State<Home> {
   }
 
   logout() async {
+    makeUserOffline();
     await googleSignIn.signOut();
   }
 
@@ -303,8 +307,37 @@ class _HomeState extends State<Home> {
           );
   }
 
+  makeUserOnline() {
+    // Firestore
+    userRef.document(currentUser.id).updateData({
+      'online': true,
+      'last_active': 0,
+    });
+
+    // Firebase
+    firebaseDatabase.reference().child('status').update({
+      currentUser.id: 'online',
+    });
+
+//    firebaseDatabase.reference().child('status').onDisconnect().update({
+//      currentUser.id: 'offline',
+//    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return isLogin ? buildHomePage() : buildLoginScreen();
   }
+}
+
+makeUserOffline() {
+  // Firestore
+  userRef.document(currentUser.id).updateData({
+    'last_active': DateTime.now(),
+  });
+
+  // Firebase
+  firebaseDatabase.reference().child('status').update({
+    currentUser.id: "offline",
+  });
 }

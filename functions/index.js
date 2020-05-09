@@ -301,3 +301,32 @@ exports.onCreateMessage = functions.firestore
         });
 });
 
+// ------- Update User Status (Online/Offline) ------------
+
+const firestore = functions.firestore;
+
+exports.onUserStatusChange = functions.database.ref('/status/{userId}')
+	.onUpdate(async (change, context) => {
+
+		var db = admin.firestore();
+
+
+		//const usersRef = firestore.document('/users/' + event.params.userId);
+		const usersRef = db.collection("users");
+		var snapShot = change.after;
+
+		return change.after.ref.once('value')
+			.then(statusSnap => snapShot.val())
+			.then(status => {
+				if (status === 'offline'){
+					usersRef
+						.doc(context.params.userId)
+						.update({
+							online: false,
+							last_active: Date.now()
+						}, {merge: true});
+				}
+			})
+	});
+
+//	        const postUpdated = change.after.data();
