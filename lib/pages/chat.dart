@@ -9,16 +9,14 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 2: Show user follower and following list
-// TODO 3: Update Profile screen
-// TODO 4: Do something with bio
-// TODO 5: Make minor changes in timline (posts)
-// TODO 6: UI update in upload, give confirmation that post is uploaded
-// TODO 7: fix bug in create account
-// TODO 8: Self Distructable on-off
-// TODO 9: Check internet connectivity
-// TODO 10: ADD black theme
-// TODO 11: Add security to firebase
+// TODO 1: Show user follower and following list
+// TODO 2: Handle Delete post
+// TODO 3: UI update in upload, give confirmation that post is uploaded
+// TODO 4: fix bug in create account
+// TODO 5: Self Distructable on-off
+// TODO 6: Check internet connectivity
+// TODO 7: Add black theme
+// TODO 8: Add security to firebase
 
 class ChatScreen extends StatefulWidget {
   final String profileId;

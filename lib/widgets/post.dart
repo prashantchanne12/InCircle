@@ -4,6 +4,7 @@ import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/activity_feed.dart';
 import 'package:in_circle/pages/comments.dart';
@@ -375,7 +376,7 @@ class _PostState extends State<Post> {
               child: Icon(
                 Icons.chat_bubble_outline,
                 size: 28.0,
-                color: Colors.deepPurple,
+                color: kPrimaryColor,
               ),
               onTap: () => showComments(
                 context,

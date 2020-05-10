@@ -13,6 +13,7 @@ import 'package:in_circle/widgets/progress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image/image.dart' as im;
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class UploadPost extends StatefulWidget {
   final User user;
@@ -299,12 +300,47 @@ class _UploadPostState extends State<UploadPost> {
       location: locationController.text,
       desc: captionController.text,
     );
+
     captionController.clear();
     locationController.clear();
     setState(() {
       file = null;
       isUploading = false;
     });
+
+    Alert(
+      context: context,
+      type: AlertType.success,
+      title: "Uploaded",
+      desc: "Image is uploaded successfully",
+      style: AlertStyle(
+        alertBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        titleStyle: TextStyle(
+          fontFamily: 'mont',
+          fontSize: 16.0,
+          color: Colors.black,
+        ),
+        descStyle: TextStyle(
+          fontFamily: 'mont',
+          fontSize: 16.0,
+          color: Colors.black,
+        ),
+      ),
+      buttons: [
+        DialogButton(
+          color: kPrimaryColor,
+          child: Text(
+            "Okay",
+            style: TextStyle(
+                color: Colors.white, fontSize: 20, fontFamily: 'mont'),
+          ),
+          onPressed: () => Navigator.pop(context),
+          width: 120,
+        )
+      ],
+    ).show();
   }
 
   compressImage() async {
