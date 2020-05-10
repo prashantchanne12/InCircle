@@ -319,9 +319,9 @@ class _HomeState extends State<Home> {
       currentUser.id: 'online',
     });
 
-//    firebaseDatabase.reference().child('status').onDisconnect().update({
-//      currentUser.id: 'offline',
-//    });
+    firebaseDatabase.reference().child('status').onDisconnect().update({
+      currentUser.id: 'offline',
+    });
   }
 
   @override

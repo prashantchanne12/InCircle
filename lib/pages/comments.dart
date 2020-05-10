@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/pages/home.dart';
-import 'package:in_circle/widgets/header.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:timeago/timeago.dart' as timeago;
 

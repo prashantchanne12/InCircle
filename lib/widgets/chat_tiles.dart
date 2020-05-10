@@ -207,63 +207,93 @@ class ChatTilesItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 2.0),
-      child: Column(
-        children: <Widget>[
-          Container(
-            color: Colors.white,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                              profileId: id,
-                              username: username,
-                              photoUrl: photoUrl,
-                            )));
-              },
-              child: ListTile(
-                title: Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: Text(
-                    username,
-                    style: TextStyle(
-                      fontFamily: 'mont',
-                      fontSize: 18.0,
-                      color: Colors.black,
+    return StreamBuilder(
+      stream: userRef.document(id).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return circularProgress();
+        }
+        User _user = User.fromDocument(snapshot.data);
+        return Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Column(
+            children: <Widget>[
+              Container(
+                color: Colors.white,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                                  profileId: id,
+                                  username: username,
+                                  photoUrl: photoUrl,
+                                )));
+                  },
+                  child: ListTile(
+                    title: Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Text(
+                            username,
+                            style: TextStyle(
+                              fontFamily: 'mont',
+                              fontSize: 18.0,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 4.0),
+                          child: _user.online == true
+                              ? Icon(
+                                  Icons.brightness_1,
+                                  color: Colors.green[500],
+                                  size: 15.0,
+                                )
+                              : Text(''),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircleAvatar(
-                    backgroundColor: kPrimaryColor,
-                    backgroundImage: CachedNetworkImageProvider(photoUrl),
-                  ),
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: Text(
-                    'Check out messages',
-                    style: TextStyle(
-                      fontFamily: 'mont',
+                    leading: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircleAvatar(
+                        backgroundColor: kPrimaryColor,
+                        backgroundImage: CachedNetworkImageProvider(photoUrl),
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        'Check out messages',
+                        style: TextStyle(
+                          fontFamily: 'mont',
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+              Divider(
+                color: Colors.blueGrey,
+                height: 1.0,
+              ),
+            ],
           ),
-          Divider(
-            color: Colors.blueGrey,
-            height: 1.0,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
+
+//   User _user;
+//    userRef.document(id).get().then((DocumentSnapshot documentSnapshot) {
+//      _user = User.fromDocument(documentSnapshot);
+//      print(_user.displayName);
+//    });
+//    print(_user);
 
 class UserResult extends StatelessWidget {
   final User user;

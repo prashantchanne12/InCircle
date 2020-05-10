@@ -9,6 +9,17 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
+// TODO 3: Recent message if has any
+// TODO 4: add badges in activity nav
+// TODO 5: Update edit profile
+// TODO 6: Update Profile screen
+// TODO 7: Do something with bio
+// TODO 8: Make minor changes in timline (posts)
+// TODO 9: UI update in upload, give confirmation that post is uploaded
+// TODO 10: fix bug in create account
+// TODO 11: Add security to firebase
+// TODO 12: Self Distructable on-off
+
 class ChatScreen extends StatefulWidget {
   final String profileId;
   final String username;
@@ -45,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
         .document(widget.profileId)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
-      print('Reciber info called');
+      print('Receiver info called');
       User sender = User.fromDocument(documentSnapshot);
       setState(() {
         chatUser = sender;
@@ -95,11 +106,66 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  getOnline() {
+    return StreamBuilder(
+      stream: userRef.document(widget.profileId).snapshots(),
+      builder: (context, snapshots) {
+        if (!snapshots.hasData) {
+          return circularProgress();
+        }
+
+        User _user = User.fromDocument(snapshots.data);
+        return _user.online
+            ? Row(
+                children: <Widget>[
+                  Container(
+                    child: Icon(
+                      Icons.brightness_1,
+                      color: Colors.green[500],
+                      size: 15.0,
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 5.0),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Active now',
+                      style: TextStyle(
+                        fontFamily: 'mont',
+                        fontSize: 14.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Offline',
+                  style: TextStyle(
+                    fontFamily: 'mont',
+                    fontSize: 14.0,
+                    color: Colors.black,
+                  ),
+                ),
+              );
+      },
+    );
+  }
+
   buildSearchBar() {
     return AppBar(
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       elevation: 1.0,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        color: kPrimaryColor,
+      ),
       title: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -111,13 +177,23 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           );
         },
-        child: Text(
-          widget.username,
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontFamily: 'mont',
-            fontWeight: FontWeight.w900,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Text(
+                  widget.username,
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontFamily: 'mont',
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+            getOnline(),
+          ],
         ),
       ),
     );
@@ -420,15 +496,31 @@ class MessageBubble extends StatelessWidget {
             ),
           ),
           Container(
-            padding: EdgeInsets.only(right: 5.0),
-            child: isSeen && isMe
-                ? Text(
-                    'seen',
-                    style: TextStyle(
-                      fontFamily: 'mont',
-                    ),
-                  )
-                : null,
+            padding: EdgeInsets.only(right: 5.0, top: 5.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                isSeen && isMe
+                    ? Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 18.0,
+                      )
+                    : Container(
+                        alignment: Alignment.centerRight,
+                      ),
+                isSeen == false && isMe == true
+                    ? Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.green,
+                        size: 18.0,
+                      )
+                    : Container(
+                        alignment: Alignment.centerRight,
+                      ),
+              ],
+            ),
           ),
         ],
       ),

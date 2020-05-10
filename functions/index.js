@@ -323,10 +323,17 @@ exports.onUserStatusChange = functions.database.ref('/status/{userId}')
 						.doc(context.params.userId)
 						.update({
 							online: false,
-							last_active: Date.now()
+							last_active: Date(Date.now())
 						}, {merge: true});
 				}
 			})
 	});
 
 //	        const postUpdated = change.after.data();
+/*
+ // Use of Date.now() function
+  var d = Date(Date.now());
+
+  // Converting the number of millisecond in date string
+  a = d.toString()
+*/
