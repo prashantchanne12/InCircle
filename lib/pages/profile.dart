@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
+import 'package:in_circle/pages/follow_user_lists.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/pages/post_screen.dart';
 import 'package:in_circle/widgets/post.dart';
@@ -379,14 +380,24 @@ class _ProfileState extends State<Profile> {
         .document(widget.profileId)
         .collection('userFollowers')
         .document(currentUserId)
-        .setData({});
+        .setData({
+      'id': currentUserId,
+      'displayName': currentUser.displayName,
+      'photoUrl': currentUser.photoUrl,
+      'username': currentUser.username,
+    });
 
     // Update user's following collection
     followingRef
         .document(currentUserId)
         .collection('userFollowing')
         .document(widget.profileId)
-        .setData({});
+        .setData({
+      'id': user.id,
+      'displayName': user.displayName,
+      'photoUrl': user.photoUrl,
+      'username': user.username,
+    });
 
     // add activity feed item for that user to notify about new follower
     activityFeedRef
@@ -462,8 +473,30 @@ class _ProfileState extends State<Profile> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         buildCountColumns('Posts', postCount),
-        buildCountColumns('Followers', followerCount),
-        buildCountColumns('Following', followingCount),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FollowList(
+                          profileId: widget.profileId,
+                          isFollow: true,
+                        )));
+          },
+          child: buildCountColumns('Followers', followerCount),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FollowList(
+                          profileId: widget.profileId,
+                          isFollow: false,
+                        )));
+          },
+          child: buildCountColumns('Following', followingCount),
+        ),
       ],
     );
   }

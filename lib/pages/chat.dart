@@ -11,6 +11,8 @@ import 'home.dart';
 
 // TODO 1: Show user follower and following list
 // TODO 2: Handle Delete post
+// TODO 2.1: Handle last active
+// TODO 2.2: Handle unfollow might have bug in it use stream builder
 // TODO 3: UI update in upload, give confirmation that post is uploaded
 // TODO 4: fix bug in create account
 // TODO 5: Self Distructable on-off
