@@ -1,9 +1,16 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:in_circle/constants.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/widgets/progress.dart';
+import 'package:image/image.dart' as im;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 import 'home.dart';
 
@@ -24,12 +31,24 @@ class _EditProfileState extends State<EditProfile> {
   bool _displayValid = true;
   bool _bioValid = true;
 
+  File file;
+  String imageUrlId = Uuid().v4();
+
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    getUser();
+    userRef
+        .document(widget.currentUserId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      setState(() {
+        user = User.fromDocument(documentSnapshot);
+        displayNameController.text = user.displayName;
+        bioController.text = user.bio;
+      });
+    });
   }
 
   getUser() async {
@@ -40,12 +59,12 @@ class _EditProfileState extends State<EditProfile> {
     DocumentSnapshot documentSnapshot =
         await userRef.document(widget.currentUserId).get();
 
-    user = User.fromDocument(documentSnapshot);
-
-    displayNameController.text = user.displayName;
-    bioController.text = user.bio;
-
     setState(() {
+      user = User.fromDocument(documentSnapshot);
+
+      displayNameController.text = user.displayName;
+      bioController.text = user.bio;
+
       isLoading = false;
     });
   }
@@ -87,41 +106,136 @@ class _EditProfileState extends State<EditProfile> {
           )
         ],
       ),
-      body: isLoading
-          ? circularProgress()
-          : ListView(
+      body: ListView(
+        children: <Widget>[
+          isLoading ? linearProgress() : Text(''),
+          Container(
+            child: Column(
               children: <Widget>[
-                Container(
+                buildCircleAvatar(),
+                Padding(
+                  padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: 16.0,
-                          bottom: 8.0,
-                        ),
-                        child: CircleAvatar(
-                          radius: 50.0,
-                          backgroundImage:
-                              CachedNetworkImageProvider(user.photoUrl),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          children: <Widget>[
-                            buildDisplayNameField(),
-                            buildBioField(),
-                          ],
-                        ),
-                      ),
-                      buildUpdateButton(),
-                      buildLogoutButton(),
+                      buildDisplayNameField(),
+                      buildBioField(),
                     ],
                   ),
                 ),
+                buildUpdateButton(),
+                buildLogoutButton(),
               ],
             ),
+          ),
+        ],
+      ),
     );
+  }
+
+  buildCircleAvatar() {
+    return GestureDetector(
+      onTap: () {
+        selectImage(context);
+      },
+      child: file != null
+          ? CircleAvatar(
+              child: Icon(
+                Icons.camera_alt,
+                color: Colors.black,
+              ),
+              radius: 60.0,
+              backgroundImage: FileImage(file),
+            )
+          : CircleAvatar(
+              child: Icon(
+                Icons.camera_alt,
+                color: Colors.black,
+              ),
+              radius: 60.0,
+              backgroundColor: Colors.grey,
+              backgroundImage: CachedNetworkImageProvider(user.photoUrl),
+            ),
+    );
+  }
+
+  selectImage(BuildContext parentContext) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            children: <Widget>[
+              SimpleDialogOption(
+                child: Text(
+                  'Open a Camera',
+                  style: TextStyle(fontFamily: 'mont'),
+                ),
+                onPressed: () => handleTakePhoto(),
+              ),
+              SimpleDialogOption(
+                child: Text(
+                  'Open a Gallery',
+                  style: TextStyle(fontFamily: 'mont'),
+                ),
+                onPressed: () => handleChooseFromGallery(),
+              ),
+              SimpleDialogOption(
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontFamily: 'mont',
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        });
+  }
+
+  handleTakePhoto() async {
+    Navigator.pop(context);
+    File file = await ImagePicker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 960,
+      maxHeight: 675,
+    );
+    setState(() {
+      this.file = file;
+    });
+  }
+
+  handleChooseFromGallery() async {
+    Navigator.pop(context);
+    File file = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      this.file = file;
+    });
+  }
+
+  compressImage() async {
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+    im.Image imageFile = im.decodeImage(file.readAsBytesSync());
+
+    final compressedImageFile = File('$path/$imageUrlId.jpg')
+      ..writeAsBytesSync(
+        im.encodeJpg(imageFile, quality: 60),
+      );
+
+    setState(() {
+      file = compressedImageFile;
+    });
+  }
+
+  Future<String> uploadImage(imageFile) async {
+    StorageUploadTask uploadTask = storageRef
+        .child('profile')
+        .child('profile_$imageUrlId.jpg')
+        .putFile(imageFile);
+    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    String downloadUrl = await storageTaskSnapshot.ref.getDownloadURL();
+//    print(downloadUrl);
+    return downloadUrl;
   }
 
   buildUpdateButton() {
@@ -232,7 +346,8 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  updateProfileData() {
+  updateProfileData() async {
+    String downloadUrl = '';
     setState(() {
       displayNameController.text.trim().length < 3 ||
               displayNameController.text.isEmpty
@@ -242,19 +357,36 @@ class _EditProfileState extends State<EditProfile> {
       bioController.text.trim().length > 100
           ? _bioValid = false
           : _bioValid = true;
-
-      if (_displayValid && _bioValid) {
-        userRef.document(widget.currentUserId).updateData({
-          'displayName': displayNameController.text,
-          'bio': bioController.text
-        });
-        SnackBar snackBar = SnackBar(
-          backgroundColor: Colors.green,
-          content: Text('Profile Upadted'),
-        );
-        _scaffoldKey.currentState.showSnackBar(snackBar);
-      }
     });
+    if (_displayValid && _bioValid) {
+      setState(() {
+        isLoading = true;
+      });
+
+      if (file != null) {
+        await compressImage();
+        downloadUrl = await uploadImage(file);
+      }
+
+      userRef.document(widget.currentUserId).updateData({
+        'displayName': displayNameController.text,
+        'bio': bioController.text,
+        'photoUrl': file != null ? downloadUrl : currentUser.photoUrl
+      });
+
+      setState(() {
+        isLoading = false;
+        file = null;
+      });
+
+      SnackBar snackBar = SnackBar(
+        backgroundColor: Colors.green,
+        content: Text('Profile Upadted'),
+      );
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+
+      getUser();
+    }
   }
 
   logout() async {

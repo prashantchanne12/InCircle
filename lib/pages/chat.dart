@@ -9,7 +9,9 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 2: Update edit profile
+// TODO 2: Edit profile upload post
+// TODO 2.1 : Search bar progress bar and search result
+// TODO 2.2 : Might wanna add AppBar in profile
 // TODO 3: Update Profile screen
 // TODO 4: Do something with bio
 // TODO 5: Make minor changes in timline (posts)
