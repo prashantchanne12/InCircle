@@ -37,30 +37,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     getProfilePosts();
-    getFollowers();
-    getFollowing();
     checkIfFollowing();
-  }
-
-  getFollowers() async {
-    QuerySnapshot querySnapshot = await followersRef
-        .document(widget.profileId)
-        .collection('userFollowers')
-        .getDocuments();
-    setState(() {
-      followerCount = querySnapshot.documents.length;
-    });
-  }
-
-  getFollowing() async {
-    QuerySnapshot querySnapshot = await followingRef
-        .document(widget.profileId)
-        .collection('userFollowing')
-        .getDocuments();
-    setState(() {
-//      print('Following Count: $followingCount');
-      followingCount = querySnapshot.documents.length;
-    });
   }
 
   checkIfFollowing() async {
@@ -413,11 +390,6 @@ class _ProfileState extends State<Profile> {
       'timestamp': timestamp,
       'isSeen': false,
     });
-    setState(() {
-      getFollowing();
-      getFollowers();
-      checkIfFollowing();
-    });
   }
 
   handleUnFollowUsers() {
@@ -460,19 +432,13 @@ class _ProfileState extends State<Profile> {
         doc.reference.delete();
       }
     });
-
-    setState(() {
-      getFollowing();
-      getFollowers();
-      checkIfFollowing();
-    });
   }
 
   buildCounts() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        buildCountColumns('Posts', postCount),
+        buildPostColumns('Posts', postCount),
         InkWell(
           onTap: () {
             Navigator.push(
@@ -483,7 +449,7 @@ class _ProfileState extends State<Profile> {
                           isFollow: true,
                         )));
           },
-          child: buildCountColumns('Followers', followerCount),
+          child: buildCountColumns('Followers'),
         ),
         InkWell(
           onTap: () {
@@ -495,13 +461,13 @@ class _ProfileState extends State<Profile> {
                           isFollow: false,
                         )));
           },
-          child: buildCountColumns('Following', followingCount),
+          child: buildCountColumns('Following'),
         ),
       ],
     );
   }
 
-  buildCountColumns(String label, int count) {
+  buildPostColumns(String label, int count) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -526,6 +492,53 @@ class _ProfileState extends State<Profile> {
           ),
         ),
       ],
+    );
+  }
+
+  buildCountColumns(String label) {
+    return StreamBuilder(
+      stream: label == 'Followers'
+          ? followersRef
+              .document(widget.profileId)
+              .collection('userFollowers')
+              .snapshots()
+          : followingRef
+              .document(widget.profileId)
+              .collection('userFollowing')
+              .snapshots(),
+      builder: (context, snapshots) {
+        if (!snapshots.hasData) {
+          return CircularProgressIndicator(
+            backgroundColor: kPrimaryColor,
+          );
+        }
+        int count = snapshots.data.documents.length;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              count.toString(),
+              style: TextStyle(
+                fontSize: 22.0,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'mont',
+              ),
+            ),
+            Container(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: 'mont',
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -9,7 +9,6 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 1: Show user follower and following list
 // TODO 2: Handle Delete post
 // TODO 2.1: Handle last active
 // TODO 2.2: Handle unfollow might have bug in it use stream builder
