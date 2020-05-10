@@ -14,6 +14,8 @@ class ChatTiles extends StatefulWidget {
   _ChatTilesState createState() => _ChatTilesState();
 }
 
+Firestore _firestore = Firestore.instance;
+
 class _ChatTilesState extends State<ChatTiles> {
   TextEditingController searchController = TextEditingController();
   Future<QuerySnapshot> searchResultsFuture;
@@ -143,7 +145,7 @@ class _ChatTilesState extends State<ChatTiles> {
       future: searchResultsFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return circularProgress();
+          return CircularProgressIndicator();
         } else {
           List<UserResult> searchResults = [];
           snapshot.data.documents.forEach((doc) {
@@ -204,6 +206,90 @@ class ChatTilesItem extends StatelessWidget {
       photoUrl: doc['photoUrl'],
     );
   }
+
+  /*
+      // we are appending smaller to greater
+    // -1 : first string is smaller
+    //  1 : first string is greater and 2nd is smaller
+    //  0 : both are equal
+    if (currentUser.id.compareTo(widget.profileId) == -1) {
+      setState(() {
+        chatId = currentUser.id + widget.profileId;
+      });
+    } else {
+      setState(() {
+        chatId = widget.profileId + currentUser.id;
+      });
+    }
+   */
+
+  getRecentChat() {
+    String chatId = '';
+    // we are appending smaller to greater
+    // -1 : first string is smaller
+    //  1 : first string is greater and 2nd is smaller
+    //  0 : both are equal
+    if (currentUser.id.compareTo(id) == -1) {
+      chatId = currentUser.id + id;
+    } else {
+      chatId = id + currentUser.id;
+    }
+    return StreamBuilder(
+      stream: _firestore
+          .collection('messages')
+          .document(chatId)
+          .collection('chats')
+          .where('isSeen', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshots) {
+        if (!snapshots.hasData) {
+          return Text(
+            'Checking...',
+            style: TextStyle(fontFamily: 'mont'),
+          );
+        } else {
+          int count = 0;
+          snapshots.data.documents.forEach((DocumentSnapshot documentSnapshot) {
+            final messageReceiver = documentSnapshot.data['receiverId'];
+            if (messageReceiver == currentUser.id) {
+              count = count + 1;
+            }
+          });
+          return RichText(
+            text: TextSpan(
+              style: TextStyle(fontFamily: 'mont', color: Colors.black54),
+              children: <TextSpan>[
+                TextSpan(
+                    text: count == 0 ? 'No' : '$count',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: ' new messages'),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  /*
+  Text(
+            count == 0 ? 'No new messagses' : '$count new Messages',
+            style: TextStyle(fontFamily: 'mont', color: Colors.black),
+          );
+   */
+
+/*
+RichText(
+  text: TextSpan(
+    text: 'Hello ',
+    style: DefaultTextStyle.of(context).style,
+    children: <TextSpan>[
+      TextSpan(text: 'bold', style: TextStyle(fontWeight: FontWeight.bold)),
+      TextSpan(text: ' world!'),
+    ],
+  ),
+)
+ */
 
   @override
   Widget build(BuildContext context) {
@@ -266,12 +352,7 @@ class ChatTilesItem extends StatelessWidget {
                     ),
                     subtitle: Padding(
                       padding: const EdgeInsets.only(left: 10.0),
-                      child: Text(
-                        'Check out messages',
-                        style: TextStyle(
-                          fontFamily: 'mont',
-                        ),
-                      ),
+                      child: getRecentChat(),
                     ),
                   ),
                 ),
