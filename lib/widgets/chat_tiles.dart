@@ -124,16 +124,15 @@ class _ChatTilesState extends State<ChatTiles> {
   }
 
   clearSearch() {
-    searchController.clear();
     setState(() {
+      searchController.clear();
       isSearch = false;
     });
   }
 
   handleSearch(String query) {
-    Future<QuerySnapshot> users = userRef
-        .where('displayName', isGreaterThanOrEqualTo: query)
-        .getDocuments();
+    Future<QuerySnapshot> users =
+        userRef.where('username', isGreaterThanOrEqualTo: query).getDocuments();
 
     setState(() {
       searchResultsFuture = users;
@@ -145,7 +144,7 @@ class _ChatTilesState extends State<ChatTiles> {
       future: searchResultsFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+          return circularProgress();
         } else {
           List<UserResult> searchResults = [];
           snapshot.data.documents.forEach((doc) {

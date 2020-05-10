@@ -9,7 +9,6 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 2: Edit profile upload post
 // TODO 2.1 : Search bar progress bar and search result
 // TODO 2.2 : Might wanna add AppBar in profile
 // TODO 3: Update Profile screen
@@ -156,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  buildSearchBar() {
+  buildNamedBar() {
     return AppBar(
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
@@ -379,7 +378,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildSearchBar(),
+      appBar: buildNamedBar(),
       body: buildChatScreen(),
 //          searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
     );
