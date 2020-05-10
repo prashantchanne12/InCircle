@@ -107,10 +107,24 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        title: Text(
+          'InCircle',
+          style: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'mont',
+            fontSize: 22.0,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        elevation: 0.0,
+      ),
       body: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: 10),
+            padding: EdgeInsets.only(top: 0.0),
             child: buildProfileHeader(),
           ),
           Padding(
@@ -142,7 +156,7 @@ class _ProfileState extends State<Profile> {
           user = User.fromDocument(snapshot.data);
 
           return Padding(
-            padding: const EdgeInsets.only(top: 30.0, left: 25.0),
+            padding: const EdgeInsets.only(left: 25.0),
             child: Row(
               children: <Widget>[
                 Container(
