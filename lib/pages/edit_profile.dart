@@ -68,15 +68,23 @@ class _EditProfileState extends State<EditProfile> {
           ),
         ),
         actions: <Widget>[
-          IconButton(
-              icon: Icon(
-                Icons.done,
-                size: 30.0,
-                color: Colors.green,
+          InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              padding: EdgeInsets.only(right: 10.0, top: 15.0),
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'mont',
+                  color: kPrimaryColor,
+                ),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
+            ),
+          )
         ],
       ),
       body: isLoading
@@ -106,40 +114,73 @@ class _EditProfileState extends State<EditProfile> {
                           ],
                         ),
                       ),
-                      RaisedButton(
-                        onPressed: () => updateProfileData(),
-                        child: Text(
-                          'Update Profile',
-                          style: TextStyle(
-                            fontFamily: 'mont',
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: FlatButton.icon(
-                          onPressed: () => logout(),
-                          icon: Icon(
-                            Icons.cancel,
-                            color: Colors.red,
-                          ),
-                          label: Text(
-                            'Log out',
-                            style: TextStyle(
-                              fontFamily: 'mont',
-                              fontSize: 20.0,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ),
+                      buildUpdateButton(),
+                      buildLogoutButton(),
                     ],
                   ),
                 ),
               ],
             ),
+    );
+  }
+
+  buildUpdateButton() {
+    return Padding(
+      padding: EdgeInsets.only(top: 25.0, bottom: 10.0),
+      child: Container(
+        height: 40.0,
+        width: 350.0,
+        child: Material(
+          borderRadius: BorderRadius.circular(9.0),
+          color: kPrimaryColor,
+          child: InkWell(
+            onTap: () {
+              updateProfileData();
+            },
+            child: Center(
+              child: Text(
+                'Update Profile',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'mont',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  buildLogoutButton() {
+    return Padding(
+      padding: EdgeInsets.only(top: 25.0, bottom: 10.0),
+      child: Container(
+        height: 40.0,
+        width: 350.0,
+        child: Material(
+          borderRadius: BorderRadius.circular(9.0),
+          color: Colors.white,
+          child: InkWell(
+            onTap: () {
+              logout();
+            },
+            child: Center(
+              child: Text(
+                'Log Out',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontFamily: 'mont',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 

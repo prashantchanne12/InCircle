@@ -9,7 +9,6 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 1: Recent message if has any
 // TODO 2: Update edit profile
 // TODO 3: Update Profile screen
 // TODO 4: Do something with bio
