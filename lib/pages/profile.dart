@@ -386,6 +386,7 @@ class _ProfileState extends State<Profile> {
       'userId': currentUserId,
       'userProfileImage': currentUser.photoUrl,
       'timestamp': timestamp,
+      'isSeen': false,
     });
     setState(() {
       getFollowing();

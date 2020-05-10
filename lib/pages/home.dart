@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -43,6 +42,7 @@ class _HomeState extends State<Home> {
   var phones = [];
   int selectIndex = 0;
   PageController pageController;
+//  int count = 0;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -168,8 +168,23 @@ class _HomeState extends State<Home> {
     }
     currentUser = User.fromDocument(documentSnapshot);
     makeUserOnline();
+//    QuerySnapshot querySnapshot = await activityFeedRef
+//        .document(currentUser.id)
+//        .collection('feedItems')
+//        .orderBy('timestamp', descending: true)
+//        .where('isSeen', isEqualTo: false)
+//        .limit(50)
+//        .getDocuments();
+//
+//    int pages = querySnapshot.documents.length;
+//    setState(() {
+//      count = pages;
+//    });
+
 //    print(currentUser.displayName);
   }
+
+  int page = 0;
 
   login() {
     googleSignIn.signIn();
@@ -180,48 +195,76 @@ class _HomeState extends State<Home> {
     await googleSignIn.signOut();
   }
 
+  getIconBadge() {
+    return StreamBuilder(
+      stream: activityFeedRef
+          .document(currentUser.id)
+          .collection('feedItems')
+          .orderBy('timestamp', descending: true)
+          .where('isSeen', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshots) {
+        if (!snapshots.hasData) {
+          print('wait!!');
+        } else {
+          page = snapshots.data.documents.length;
+        }
+
+        return Stack(
+          children: <Widget>[
+            Icon(Icons.favorite),
+            Positioned(
+              right: 0,
+              child: page != 0
+                  ? Container(
+                      padding: EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 15,
+                        minHeight: 15,
+                      ),
+                      child: Text(
+                        '$page',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : Container(),
+            )
+          ],
+        );
+      },
+    );
+  }
+
   buildHomePage() {
     return Scaffold(
       key: _scaffoldKey,
-      bottomNavigationBar: FFNavigationBar(
-        theme: FFNavigationBarTheme(
-          barBackgroundColor: Colors.white,
-          selectedItemBackgroundColor: kPrimaryColor,
-          selectedItemIconColor: Colors.white,
-          selectedItemLabelColor: Colors.black,
-          selectedItemBorderColor: Colors.white,
-        ),
-        selectedIndex: selectIndex,
-        onSelectTab: (index) {
-          setState(() {
-            this.selectIndex = index;
-          });
-          pageController.animateToPage(selectIndex,
-              duration: Duration(
-                milliseconds: 200,
-              ),
-              curve: Curves.easeInOut);
-        },
+      bottomNavigationBar: CupertinoTabBar(
+        currentIndex: selectIndex,
+        onTap: onTap,
+        activeColor: kPrimaryColor,
         items: [
-          FFNavigationBarItem(
-            iconData: Icons.home,
-            label: 'Feed',
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
           ),
-          FFNavigationBarItem(
-            iconData: Icons.message,
-            label: 'Chats',
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
           ),
-          FFNavigationBarItem(
-            iconData: Icons.add_box,
-            label: 'Upload',
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_box),
           ),
-          FFNavigationBarItem(
-            iconData: Icons.favorite,
-            label: 'Activity',
+          BottomNavigationBarItem(
+            icon: getIconBadge(),
           ),
-          FFNavigationBarItem(
-            iconData: Icons.account_circle,
-            label: 'Profile',
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
           ),
         ],
       ),
@@ -241,8 +284,25 @@ class _HomeState extends State<Home> {
           ),
         ],
         controller: pageController,
+        onPageChanged: onPageChanged,
         physics: NeverScrollableScrollPhysics(),
       ),
+    );
+  }
+
+  onPageChanged(int pageIndex) {
+    setState(() {
+      this.selectIndex = pageIndex;
+    });
+  }
+
+  onTap(int pageIndex) {
+    pageController.animateToPage(
+      pageIndex,
+      duration: Duration(
+        milliseconds: 200,
+      ),
+      curve: Curves.easeInOut,
     );
   }
 

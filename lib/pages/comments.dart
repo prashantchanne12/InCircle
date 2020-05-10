@@ -77,7 +77,8 @@ class _CommentsState extends State<Comments> {
         'userProfileImage': currentUser.photoUrl,
         'postId': postId,
         'mediaUrl': postMediaUrl,
-        'timestamp': timestamp
+        'timestamp': timestamp,
+        'isSeen': false,
       });
     }
 

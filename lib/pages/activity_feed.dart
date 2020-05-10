@@ -22,6 +22,16 @@ class _ActivityFeedState extends State<ActivityFeed> {
         .limit(50)
         .getDocuments();
 
+    querySnapshot.documents.forEach((DocumentSnapshot documentSnapshot) {
+      activityFeedRef
+          .document(currentUser.id)
+          .collection('feedItems')
+          .document(documentSnapshot.documentID)
+          .updateData({
+        'isSeen': true,
+      });
+    });
+
     List<ActivityFeedItem> feedItems = [];
 
     querySnapshot.documents.forEach((doc) {
@@ -76,6 +86,7 @@ class ActivityFeedItem extends StatelessWidget {
   final String userProfileImage;
   final String commentData;
   final Timestamp timestamp;
+  final bool isSeen;
 
   ActivityFeedItem({
     this.username,
@@ -86,6 +97,7 @@ class ActivityFeedItem extends StatelessWidget {
     this.userProfileImage,
     this.commentData,
     this.timestamp,
+    this.isSeen,
   });
 
   factory ActivityFeedItem.fromDocument(DocumentSnapshot doc) {
@@ -98,6 +110,7 @@ class ActivityFeedItem extends StatelessWidget {
       userProfileImage: doc['userProfileImage'],
       commentData: doc['commentData'],
       timestamp: doc['timestamp'],
+      isSeen: doc['isSeen'],
     );
   }
 

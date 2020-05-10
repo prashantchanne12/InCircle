@@ -19,6 +19,7 @@ import 'home.dart';
 // TODO 10: fix bug in create account
 // TODO 11: Add security to firebase
 // TODO 12: Self Distructable on-off
+// TODO 13: Check internet connectivity
 
 class ChatScreen extends StatefulWidget {
   final String profileId;

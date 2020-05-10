@@ -345,7 +345,8 @@ class _PostState extends State<Post> {
         'userProfileImage': currentUser.photoUrl,
         'postId': postId,
         'mediaUrl': mediaUrl,
-        'timestamp': timestamp
+        'timestamp': timestamp,
+        'isSeen': false,
       });
     }
   }
