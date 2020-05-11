@@ -259,15 +259,15 @@ class _CreateAccountState extends State<CreateAccount> {
         downloadUrl = await uploadImage(file);
       }
 
-      setState(() {
-        isUpload = false;
-        file = null;
-      });
-
       final UserData userData = UserData(
           username: usernameController.text,
           displayName: displayNameController.text,
           photoUrl: file != null ? downloadUrl : widget.user.photoUrl);
+
+      setState(() {
+        isUpload = false;
+        file = null;
+      });
 
       SnackBar snackBar = SnackBar(
         content: Text('Welcome ${usernameController.text}'),

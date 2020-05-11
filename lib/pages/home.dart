@@ -30,6 +30,8 @@ final StorageReference storageRef = FirebaseStorage.instance.ref();
 final FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
 DateTime timestamp = DateTime.now();
 User currentUser;
+UserData userData;
+DocumentSnapshot documentSnapshot;
 
 class Home extends StatefulWidget {
   @override
@@ -55,6 +57,7 @@ class _HomeState extends State<Home> {
 
     // Google Sign in Listener
     googleSignIn.onCurrentUserChanged.listen((account) {
+      print(' Account - $account');
       handleSignIn(account);
     }, onError: (error) {
       print('Error in Sigining In..');
@@ -135,37 +138,38 @@ class _HomeState extends State<Home> {
     });
     // Check if the users exists in database
     final GoogleSignInAccount user = googleSignIn.currentUser;
-    DocumentSnapshot documentSnapshot = await userRef.document(user.id).get();
+    documentSnapshot = await userRef.document(user.id).get();
 
     if (!documentSnapshot.exists) {
-      final UserData userData = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CreateAccount(
-            user: user,
+      if (userData == null) {
+        userData = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateAccount(
+              user: user,
+            ),
           ),
-        ),
-      );
+        );
 
-      // Let's add user to database
-      await userRef.document(user.id).setData({
-        'id': user.id,
-        'photoUrl': userData.photoUrl,
-        'email': user.email,
-        'displayName': userData.displayName,
-        'bio': '',
-        'username': userData.username,
-        'timestamp': timestamp,
-      });
+        // Let's add user to database
+        userRef.document(user.id).setData({
+          'id': user.id,
+          'photoUrl': userData.photoUrl,
+          'email': user.email,
+          'displayName': userData.displayName,
+          'bio': '',
+          'username': userData.username,
+          'timestamp': timestamp,
+        });
 
-      await followingRef
-          .document(user.id)
-          .collection('userFollowers')
-          .document(user.id)
-          .setData({});
-
-      documentSnapshot = await userRef.document(user.id).get();
+        setState(() {
+          userRef.document(user.id).get().then((DocumentSnapshot doc) {
+            documentSnapshot = doc;
+          });
+        });
+      }
     }
+    documentSnapshot = await userRef.document(user.id).get();
     currentUser = User.fromDocument(documentSnapshot);
     makeUserOnline();
 //    QuerySnapshot querySnapshot = await activityFeedRef

@@ -11,8 +11,8 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
+// TODO 3: Fix overflow error in profile
 // TODO 2: Handle last active
-// TODO 2.1 : Delete the chat tiles on unfollow
 // TODO 4: fix bug in create account
 // TODO 6: Check internet connectivity
 // TODO 7: Add black theme

@@ -269,29 +269,30 @@ class _ProfileState extends State<Profile> {
     if (isLoading) {
       return circularProgress();
     } else if (posts.isEmpty) {
-      return Container(
-        padding: EdgeInsets.only(top: 50.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SvgPicture.asset(
-              'assets/images/notPost.svg',
-              height: 260.0,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 40.0),
-              child: Text(
-                'No Post',
-                style: TextStyle(
-                    color: kPrimaryColor,
-                    fontFamily: 'Mont',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30.0),
+      return ListView(
+        children: <Widget>[
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SvgPicture.asset(
+                'assets/images/notPost.svg',
+                height: 260.0,
               ),
-            ),
-          ],
-        ),
+              Padding(
+                padding: EdgeInsets.only(top: 40.0),
+                child: Text(
+                  'No Post',
+                  style: TextStyle(
+                      color: kPrimaryColor,
+                      fontFamily: 'Mont',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30.0),
+                ),
+              ),
+            ],
+          ),
+        ],
       );
     } else if (postOrientation == 'grid') {
       List<GridTile> gridTiles = [];
