@@ -142,6 +142,7 @@ class _ProfileState extends State<Profile> {
                   child: CircleAvatar(
                     radius: 45.0,
                     backgroundImage: NetworkImage(user.photoUrl),
+                    backgroundColor: kPrimaryColor,
                   ),
                 ),
                 Column(
@@ -211,7 +212,7 @@ class _ProfileState extends State<Profile> {
           height: 45.0,
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(color: Colors.grey),
+            border: Border.all(color: kPrimaryColor),
             borderRadius: BorderRadius.circular(50.0),
           ),
           child: Icon(

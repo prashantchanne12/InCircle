@@ -129,6 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       style: TextStyle(
                         fontFamily: 'mont',
                         fontSize: 14.0,
+                        color: Colors.grey,
                       ),
                     ),
                   ),
@@ -152,7 +153,7 @@ class _ChatScreenState extends State<ChatScreen> {
   buildNamedBar() {
     return AppBar(
       automaticallyImplyLeading: false,
-      elevation: 1.0,
+      elevation: 0.0,
       leading: IconButton(
         icon: Icon(Icons.arrow_back),
         onPressed: () {

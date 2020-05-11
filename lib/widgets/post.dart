@@ -134,7 +134,7 @@ class _PostState extends State<Post> {
           return Column(
             children: <Widget>[
               Divider(
-                color: Colors.white,
+                color: Colors.grey,
               ),
               ListTile(
                 leading: CircleAvatar(
