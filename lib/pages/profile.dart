@@ -152,7 +152,9 @@ class _ProfileState extends State<Profile> {
                       padding: EdgeInsets.only(left: 40.0),
                       alignment: Alignment.center,
                       child: Text(
-                        user.displayName,
+                        user.displayName.length > 17
+                            ? user.displayName.substring(0, 17) + '..'
+                            : user.displayName,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: 'mont',
