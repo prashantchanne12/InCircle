@@ -34,6 +34,10 @@ UserData userData;
 DocumentSnapshot documentSnapshot;
 
 class Home extends StatefulWidget {
+  final bool darkThemeEnabled;
+
+  Home(this.darkThemeEnabled);
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -285,6 +289,7 @@ class _HomeState extends State<Home> {
           ActivityFeed(),
           Profile(
             profileId: currentUser.id,
+            darkThemeEnabled: widget.darkThemeEnabled,
           ),
         ],
         controller: pageController,

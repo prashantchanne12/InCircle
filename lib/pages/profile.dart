@@ -16,8 +16,9 @@ import 'package:in_circle/pages/chat.dart';
 
 class Profile extends StatefulWidget {
   final String profileId;
+  final bool darkThemeEnabled;
 
-  Profile({@required this.profileId});
+  Profile({@required this.profileId, this.darkThemeEnabled});
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -86,10 +87,8 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
         title: Text(
           'InCircle',
           style: TextStyle(
@@ -159,7 +158,6 @@ class _ProfileState extends State<Profile> {
                         style: TextStyle(
                             fontFamily: 'mont',
                             fontSize: 20.0,
-                            color: Colors.black,
                             fontWeight: FontWeight.w900),
                       ),
                     ),
@@ -502,7 +500,6 @@ class _ProfileState extends State<Profile> {
           child: Text(
             label,
             style: TextStyle(
-              color: Colors.black54,
               fontSize: 15.0,
               fontWeight: FontWeight.w400,
               fontFamily: 'mont',
@@ -547,7 +544,6 @@ class _ProfileState extends State<Profile> {
               child: Text(
                 label,
                 style: TextStyle(
-                  color: Colors.black54,
                   fontSize: 15.0,
                   fontWeight: FontWeight.w400,
                   fontFamily: 'mont',
@@ -604,7 +600,10 @@ class _ProfileState extends State<Profile> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => EditProfile(currentUserId: currentUserId)),
+          builder: (context) => EditProfile(
+                currentUserId: currentUserId,
+                darkThemeEnabled: widget.darkThemeEnabled,
+              )),
     );
   }
 }

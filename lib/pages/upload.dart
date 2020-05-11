@@ -39,42 +39,41 @@ class _UploadPostState extends State<UploadPost> {
 
   buildSplashScreen() {
     return Container(
-        color: Colors.white,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SvgPicture.asset(
-              'assets/images/upload.svg',
-              height: 260.0,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: FlatButton(
-                onPressed: () => selectImage(context),
-                child: Container(
-                  alignment: Alignment.center,
-                  width: 160.0,
-                  height: 40.0,
-                  child: Text(
-                    'Upload Image',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'mont',
-                      fontSize: 17.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  decoration: BoxDecoration(
-                    color: kPrimaryColor,
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SvgPicture.asset(
+          'assets/images/upload.svg',
+          height: 260.0,
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 20.0),
+          child: FlatButton(
+            onPressed: () => selectImage(context),
+            child: Container(
+              alignment: Alignment.center,
+              width: 160.0,
+              height: 40.0,
+              child: Text(
+                'Upload Image',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'mont',
+                  fontSize: 17.0,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+              decoration: BoxDecoration(
+                color: kPrimaryColor,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
             ),
-          ],
-        ));
+          ),
+        ),
+      ],
+    ));
   }
 
   selectImage(BuildContext parentContext) {
@@ -88,7 +87,6 @@ class _UploadPostState extends State<UploadPost> {
                   'Open a Camera',
                   style: TextStyle(
                     fontFamily: 'mont',
-                    color: Colors.black,
                     fontSize: 17.0,
                   ),
                 ),
@@ -99,7 +97,6 @@ class _UploadPostState extends State<UploadPost> {
                   'Open a Gallery',
                   style: TextStyle(
                     fontFamily: 'mont',
-                    color: Colors.black,
                     fontSize: 17.0,
                   ),
                 ),
@@ -110,7 +107,6 @@ class _UploadPostState extends State<UploadPost> {
                   'Cancel',
                   style: TextStyle(
                     fontFamily: 'mont',
-                    color: Colors.black,
                     fontSize: 17.0,
                   ),
                 ),
@@ -151,10 +147,8 @@ class _UploadPostState extends State<UploadPost> {
 
   Scaffold buildUploadForm() {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           color: kPrimaryColor,
@@ -164,7 +158,7 @@ class _UploadPostState extends State<UploadPost> {
           'Upload Post',
           style: TextStyle(
             fontFamily: 'mont',
-            color: Colors.black,
+            color: kPrimaryColor,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -207,7 +201,6 @@ class _UploadPostState extends State<UploadPost> {
               backgroundImage: CachedNetworkImageProvider(widget.user.photoUrl),
             ),
             title: Container(
-              color: Colors.white,
               width: 250.0,
               child: TextField(
                 style: TextStyle(
@@ -229,7 +222,6 @@ class _UploadPostState extends State<UploadPost> {
               size: 35.0,
             ),
             title: Container(
-              color: Colors.white,
               width: 250.0,
               child: TextField(
                 style: TextStyle(
@@ -320,12 +312,10 @@ class _UploadPostState extends State<UploadPost> {
         titleStyle: TextStyle(
           fontFamily: 'mont',
           fontSize: 16.0,
-          color: Colors.black,
         ),
         descStyle: TextStyle(
           fontFamily: 'mont',
           fontSize: 16.0,
-          color: Colors.black,
         ),
       ),
       buttons: [

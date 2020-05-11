@@ -86,7 +86,6 @@ class _ChatTilesState extends State<ChatTiles> {
   buildNamedAppbar() {
     return AppBar(
       elevation: 0.0,
-      backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       title: Text(
         'Chats',
@@ -121,7 +120,6 @@ class _ChatTilesState extends State<ChatTiles> {
     return AppBar(
         elevation: 1.0,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
         title: TextFormField(
           controller: searchController,
           decoration: InputDecoration(
@@ -242,7 +240,7 @@ class ChatTilesItem extends StatelessWidget {
         if (!snapshots.hasData) {
           return Text(
             'Checking...',
-            style: TextStyle(fontFamily: 'mont'),
+            style: TextStyle(fontFamily: 'mont', color: kPrimaryColor),
           );
         } else {
           int count = 0;
@@ -254,7 +252,7 @@ class ChatTilesItem extends StatelessWidget {
           });
           return RichText(
             text: TextSpan(
-              style: TextStyle(fontFamily: 'mont', color: Colors.black54),
+              style: TextStyle(fontFamily: 'mont', color: kPrimaryColor),
               children: <TextSpan>[
                 TextSpan(
                     text: count == 0 ? 'No' : '$count',
@@ -302,7 +300,6 @@ RichText(
           child: Column(
             children: <Widget>[
               Container(
-                color: Colors.white,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -324,7 +321,6 @@ RichText(
                             style: TextStyle(
                               fontFamily: 'mont',
                               fontSize: 18.0,
-                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -381,7 +377,6 @@ class UserResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
       child: Column(
         children: <Widget>[
           GestureDetector(
@@ -396,15 +391,11 @@ class UserResult extends StatelessWidget {
               title: Text(
                 user.displayName,
                 style: TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               subtitle: Text(
                 user.username,
-                style: TextStyle(
-                  color: Colors.black,
-                ),
               ),
             ),
           ),

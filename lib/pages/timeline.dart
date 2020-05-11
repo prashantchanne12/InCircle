@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:in_circle/main.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/pages/home.dart';
 import 'package:in_circle/widgets/post.dart';
@@ -105,7 +104,6 @@ class _TimelineState extends State<Timeline> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
         title: Text(
           'InCircle',
           style: TextStyle(

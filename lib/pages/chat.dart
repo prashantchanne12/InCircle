@@ -11,12 +11,10 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 3: Fix overflow error in profile
-// TODO 2: Handle last active
-// TODO 4: fix bug in create account
-// TODO 6: Check internet connectivity
-// TODO 7: Add black theme
-// TODO 8: Add security to firebase
+// TODO 1: Handle last active
+// TODO 1.1: Give warning to users that chat will be deleted in 15 sec
+// TODO 2: Check internet connectivity
+// TODO 3: Add security to firebase
 
 class ChatScreen extends StatefulWidget {
   final String profileId;
@@ -131,7 +129,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       style: TextStyle(
                         fontFamily: 'mont',
                         fontSize: 14.0,
-                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -144,7 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   style: TextStyle(
                     fontFamily: 'mont',
                     fontSize: 14.0,
-                    color: Colors.black,
+                    color: Colors.grey,
                   ),
                 ),
               );
@@ -154,7 +151,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   buildNamedBar() {
     return AppBar(
-      backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       elevation: 1.0,
       leading: IconButton(
@@ -298,7 +294,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   onChanged: (value) {
                     messageText = value;
                   },
-                  style: TextStyle(color: Colors.black, fontFamily: 'mont'),
+                  style: TextStyle(fontFamily: 'mont'),
                   decoration: kMessageTextFieldDecoration,
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:in_circle/constants.dart';
+import 'package:in_circle/main.dart';
 import 'package:in_circle/model/user.dart';
 import 'package:in_circle/widgets/progress.dart';
 import 'package:image/image.dart' as im;
@@ -16,8 +18,9 @@ import 'home.dart';
 
 class EditProfile extends StatefulWidget {
   final String currentUserId;
+  final bool darkThemeEnabled;
 
-  EditProfile({@required this.currentUserId});
+  EditProfile({@required this.currentUserId, this.darkThemeEnabled});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -72,12 +75,10 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0.0,
-        backgroundColor: Colors.white,
         title: Text(
           'Edit Profile',
           style: TextStyle(
@@ -125,10 +126,30 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 buildUpdateButton(),
                 buildLogoutButton(),
+                Divider(
+                  height: 1.0,
+                  color: Colors.blueGrey,
+                ),
+                buildDarkThemeButton(),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  bool isSwitched = false;
+
+  buildDarkThemeButton() {
+    return ListTile(
+      title: Text(
+        'Dark Theme',
+        style: TextStyle(fontFamily: 'mont'),
+      ),
+      trailing: Switch(
+        value: widget.darkThemeEnabled,
+        onChanged: bloc.changeTheme,
       ),
     );
   }
@@ -142,7 +163,7 @@ class _EditProfileState extends State<EditProfile> {
           ? CircleAvatar(
               child: Icon(
                 Icons.camera_alt,
-                color: Colors.black,
+                color: kPrimaryColor,
               ),
               radius: 60.0,
               backgroundImage: FileImage(file),
@@ -150,7 +171,7 @@ class _EditProfileState extends State<EditProfile> {
           : CircleAvatar(
               child: Icon(
                 Icons.camera_alt,
-                color: Colors.black,
+                color: kPrimaryColor,
               ),
               radius: 60.0,
               backgroundColor: Colors.grey,
@@ -393,6 +414,7 @@ class _EditProfileState extends State<EditProfile> {
   logout() async {
     makeUserOffline();
     await googleSignIn.signOut();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    Navigator.pop(context);
+//    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
   }
 }

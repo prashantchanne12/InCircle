@@ -46,11 +46,9 @@ class _FollowListState extends State<FollowList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0.0,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
         title: Text(
           widget.isFollow ? 'Followers' : 'Followings',
           style: TextStyle(
@@ -119,7 +117,6 @@ class UserTile extends StatelessWidget {
           ),
         ),
         Divider(
-          color: Colors.black54,
           height: 1.0,
         ),
       ],

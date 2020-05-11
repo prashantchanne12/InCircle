@@ -131,35 +131,40 @@ class _PostState extends State<Post> {
         } else {
           User user = User.fromDocument(snapshot.data);
           bool isPostOwner = currentUserId == ownerId;
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(user.photoUrl),
-              backgroundColor: Colors.grey,
-            ),
-            title: GestureDetector(
-              onTap: () => showProfile(context, profileId: user.id),
-              child: Text(
-                user.username,
-                style: TextStyle(
-                  fontFamily: 'mont',
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+          return Column(
+            children: <Widget>[
+              Divider(
+                color: Colors.white,
               ),
-            ),
-            subtitle: Text(
-              location,
-              style: TextStyle(fontFamily: 'mont'),
-            ),
-            trailing: isPostOwner
-                ? IconButton(
-                    onPressed: () => handleDeletePost(context),
-                    icon: Icon(
-                      Icons.more_vert,
-                      color: Colors.black,
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: CachedNetworkImageProvider(user.photoUrl),
+                  backgroundColor: Colors.grey,
+                ),
+                title: GestureDetector(
+                  onTap: () => showProfile(context, profileId: user.id),
+                  child: Text(
+                    user.username,
+                    style: TextStyle(
+                      fontFamily: 'mont',
+                      fontWeight: FontWeight.bold,
                     ),
-                  )
-                : Text(""),
+                  ),
+                ),
+                subtitle: Text(
+                  location,
+                  style: TextStyle(fontFamily: 'mont'),
+                ),
+                trailing: isPostOwner
+                    ? IconButton(
+                        onPressed: () => handleDeletePost(context),
+                        icon: Icon(
+                          Icons.more_vert,
+                        ),
+                      )
+                    : Text(""),
+              ),
+            ],
           );
         }
       },
@@ -396,7 +401,6 @@ class _PostState extends State<Post> {
               child: Text(
                 '$likeCount likes',
                 style: TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'mont',
                 ),
@@ -412,7 +416,6 @@ class _PostState extends State<Post> {
               child: Text(
                 '$username ',
                 style: TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'mont',
                 ),

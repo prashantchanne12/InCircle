@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 circularProgress() {
   return Container(
-    color: Colors.white,
     alignment: Alignment.center,
     padding: EdgeInsets.only(top: 10.0),
     child: CircularProgressIndicator(

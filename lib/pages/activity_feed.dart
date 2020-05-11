@@ -43,11 +43,9 @@ class _ActivityFeedState extends State<ActivityFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0.0,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
         title: Text(
           'Activity',
           style: TextStyle(
@@ -157,7 +155,6 @@ class ActivityFeedItem extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Container(
-            color: Colors.white54,
             child: ListTile(
               title: GestureDetector(
                 onTap: () => showProfile(context, profileId: userId),
@@ -166,13 +163,15 @@ class ActivityFeedItem extends StatelessWidget {
                   text: TextSpan(
                     style: TextStyle(
                       fontSize: 14.0,
-                      color: Colors.black,
                       fontFamily: 'mont',
+                      color: Colors.grey,
                     ),
                     children: [
                       TextSpan(
                         text: username,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       TextSpan(
                         text: ' $activityItemText',

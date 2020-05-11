@@ -29,7 +29,6 @@ class PostScreen extends StatelessWidget {
             appBar: AppBar(
               elevation: 0.0,
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white,
               title: Text(
                 userId == currentUser.id ? 'You Posted' : 'InCircle',
                 style: TextStyle(
