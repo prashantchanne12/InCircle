@@ -48,6 +48,30 @@ class _ChatTilesState extends State<ChatTiles> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return circularProgress();
+                } else if (snapshot.data.length == 0) {
+                  print('No content');
+                  return Container(
+                    child: Center(
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: <Widget>[
+                          SvgPicture.asset(
+                            'assets/images/search.svg',
+                            height: 300.0,
+                          ),
+                          Text(
+                            'Find Users To Chat',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: kPrimaryColor,
+                                fontFamily: 'mont',
+                                fontSize: 35.0,
+                                fontWeight: FontWeight.w600),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
                 }
                 return ListView(
                   children: snapshot.data,
@@ -157,32 +181,6 @@ class _ChatTilesState extends State<ChatTiles> {
           );
         }
       },
-    );
-  }
-
-  buildNoContent() {
-    final Orientation orientation = MediaQuery.of(context).orientation;
-    return Container(
-      child: Center(
-        child: ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            SvgPicture.asset(
-              'assets/images/search.svg',
-              height: orientation == Orientation.portrait ? 300.0 : 200,
-            ),
-            Text(
-              'Find Users To Chat',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: kPrimaryColor,
-                  fontFamily: 'mont',
-                  fontSize: 35.0,
-                  fontWeight: FontWeight.w600),
-            )
-          ],
-        ),
-      ),
     );
   }
 }

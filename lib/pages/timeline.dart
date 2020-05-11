@@ -30,23 +30,7 @@ class _TimelineState extends State<Timeline> {
   @override
   void initState() {
     super.initState();
-    getTimeline();
     getFollowing();
-  }
-
-  getTimeline() async {
-    QuerySnapshot querySnapshot = await timelineRef
-        .document(widget.user.id)
-        .collection('timelinePosts')
-        .orderBy('timestamp', descending: true) // most recent post
-        .getDocuments();
-
-    List<Post> posts =
-        querySnapshot.documents.map((doc) => Post.fromDocument(doc)).toList();
-
-    setState(() {
-      this.posts = posts;
-    });
   }
 
   getFollowing() async {
@@ -65,12 +49,28 @@ class _TimelineState extends State<Timeline> {
     if (posts == null) {
       return circularProgress();
     } else if (posts.isEmpty) {
-      Timer(Duration(milliseconds: 300), () {
-        return Center(child: Text('No Post'));
-      });
+      buildNoContent();
     }
-    return ListView(
-      children: posts,
+    return StreamBuilder(
+      stream: timelineRef
+          .document(widget.user.id)
+          .collection('timelinePosts')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshots) {
+        if (!snapshots.hasData) {
+          return circularProgress();
+        }
+        List<Post> posts = [];
+        snapshots.data.documents.forEach((DocumentSnapshot documentSnapshot) {
+          posts.add(Post.fromDocument(documentSnapshot));
+        });
+        return posts.isEmpty
+            ? buildNoContent()
+            : ListView(
+                children: posts,
+              );
+      },
     );
   }
 
@@ -82,11 +82,11 @@ class _TimelineState extends State<Timeline> {
           shrinkWrap: true,
           children: <Widget>[
             SvgPicture.asset(
-              'assets/images/search.svg',
+              'assets/images/notPost.svg',
               height: orientation == Orientation.portrait ? 300.0 : 200,
             ),
             Text(
-              'Find Users To Chat',
+              'Follow Your Friends To See Posts',
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: kPrimaryColor,
@@ -120,7 +120,7 @@ class _TimelineState extends State<Timeline> {
       body: posts == null
           ? buildNoContent()
           : RefreshIndicator(
-              onRefresh: () => getTimeline(),
+              onRefresh: () => buildTimeline(),
               child: buildTimeline(),
             ),
     );

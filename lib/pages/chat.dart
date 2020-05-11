@@ -13,9 +13,7 @@ import 'home.dart';
 
 // TODO 2: Handle last active
 // TODO 2.1 : Delete the chat tiles on unfollow
-// TODO 3: UI update in upload, give confirmation that post is uploaded
 // TODO 4: fix bug in create account
-// TODO 5: Self Distructable on-off
 // TODO 6: Check internet connectivity
 // TODO 7: Add black theme
 // TODO 8: Add security to firebase

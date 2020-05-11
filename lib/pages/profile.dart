@@ -32,12 +32,14 @@ class _ProfileState extends State<Profile> {
   int followingCount = 0;
   List<PostProfile> posts = [];
   List<Post> postGrid = [];
+  Firestore _firestore;
 
   @override
   void initState() {
     super.initState();
     getProfilePosts();
     checkIfFollowing();
+    _firestore = Firestore.instance;
   }
 
   checkIfFollowing() async {
@@ -426,6 +428,19 @@ class _ProfileState extends State<Profile> {
         .document(widget.profileId)
         .collection('feedItems')
         .document(currentUserId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+
+    // delete user from chat tiles
+    _firestore
+        .collection('chat_tiles')
+        .document(currentUserId)
+        .collection('chat_users')
+        .document(widget.profileId)
         .get()
         .then((doc) {
       if (doc.exists) {
