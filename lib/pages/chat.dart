@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +11,8 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 2: Handle Delete post
-// TODO 2.1: Handle last active
-// TODO 2.2: Handle unfollow might have bug in it use stream builder
+// TODO 2: Handle last active
+// TODO 2.1 : Delete the chat tiles on unfollow
 // TODO 3: UI update in upload, give confirmation that post is uploaded
 // TODO 4: fix bug in create account
 // TODO 5: Self Distructable on-off
@@ -378,7 +379,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: buildNamedBar(),
       body: buildChatScreen(),
-//          searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
     );
   }
 }
@@ -399,6 +399,23 @@ class MessagesStream extends StatelessWidget {
           .orderBy('time', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
+        _firestore
+            .collection('messages')
+            .document(chatId)
+            .collection('chats')
+            .orderBy('time', descending: true)
+            .where('isSeen', isEqualTo: true)
+            .getDocuments()
+            .then((QuerySnapshot querySnapshot) {
+          querySnapshot.documents.forEach((DocumentSnapshot documentSnapshot) {
+            Timer(Duration(seconds: 15), () {
+              if (documentSnapshot.exists) {
+                documentSnapshot.reference.delete();
+              }
+            });
+          });
+        });
+
         List<MessageBubble> messageBubbles = [];
         if (!snapshot.hasData) {
           return circularProgress();

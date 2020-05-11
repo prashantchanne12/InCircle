@@ -240,6 +240,8 @@ class _PostState extends State<Post> {
         doc.reference.delete();
       }
     });
+
+    Navigator.pop(context);
   }
 
   buildPostImage() {
