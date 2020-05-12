@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,7 +29,6 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController displayNameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
   bool isLoading = false;
-  User user;
   bool _displayValid = true;
   bool _bioValid = true;
 
@@ -38,39 +36,6 @@ class _EditProfileState extends State<EditProfile> {
   String imageUrlId = Uuid().v4();
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
-    userRef
-        .document(widget.currentUserId)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      setState(() {
-        user = User.fromDocument(documentSnapshot);
-        displayNameController.text = user.displayName;
-        bioController.text = user.bio;
-      });
-    });
-  }
-
-  getUser() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    DocumentSnapshot documentSnapshot =
-        await userRef.document(widget.currentUserId).get();
-
-    setState(() {
-      user = User.fromDocument(documentSnapshot);
-
-      displayNameController.text = user.displayName;
-      bioController.text = user.bio;
-
-      isLoading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,31 +76,74 @@ class _EditProfileState extends State<EditProfile> {
       body: ListView(
         children: <Widget>[
           isLoading ? linearProgress() : Text(''),
-          Container(
-            child: Column(
-              children: <Widget>[
-                buildCircleAvatar(),
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: <Widget>[
-                      buildDisplayNameField(),
-                      buildBioField(),
-                    ],
-                  ),
-                ),
-                buildUpdateButton(),
-                buildLogoutButton(),
-                Divider(
-                  height: 1.0,
-                  color: Colors.blueGrey,
-                ),
-                buildDarkThemeButton(),
-              ],
-            ),
-          ),
+          getUserProfile(),
         ],
       ),
+    );
+  }
+
+  getUserProfile() {
+    return StreamBuilder(
+      stream: userRef.document(currentUser.id).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return circularProgress();
+        }
+        User _user = User.fromDocument(snapshot.data);
+        displayNameController.text = _user.displayName;
+        bioController.text = _user.bio;
+        return ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Container(
+              child: Column(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      selectImage(context);
+                    },
+                    child: file != null
+                        ? CircleAvatar(
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: kPrimaryColor,
+                            ),
+                            radius: 60.0,
+                            backgroundImage: FileImage(file),
+                          )
+                        : CircleAvatar(
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: kPrimaryColor,
+                            ),
+                            radius: 60.0,
+                            backgroundColor: Colors.grey,
+                            backgroundImage:
+                                CachedNetworkImageProvider(_user.photoUrl),
+                          ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        buildDisplayNameField(),
+                        buildBioField(),
+                      ],
+                    ),
+                  ),
+                  buildUpdateButton(),
+                  buildLogoutButton(),
+                  Divider(
+                    height: 1.0,
+                    color: Colors.blueGrey,
+                  ),
+                  buildDarkThemeButton(),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -151,32 +159,6 @@ class _EditProfileState extends State<EditProfile> {
         value: widget.darkThemeEnabled,
         onChanged: bloc.changeTheme,
       ),
-    );
-  }
-
-  buildCircleAvatar() {
-    return GestureDetector(
-      onTap: () {
-        selectImage(context);
-      },
-      child: file != null
-          ? CircleAvatar(
-              child: Icon(
-                Icons.camera_alt,
-                color: kPrimaryColor,
-              ),
-              radius: 60.0,
-              backgroundImage: FileImage(file),
-            )
-          : CircleAvatar(
-              child: Icon(
-                Icons.camera_alt,
-                color: kPrimaryColor,
-              ),
-              radius: 60.0,
-              backgroundColor: Colors.grey,
-              backgroundImage: CachedNetworkImageProvider(user.photoUrl),
-            ),
     );
   }
 
@@ -406,8 +388,6 @@ class _EditProfileState extends State<EditProfile> {
         content: Text('Profile Upadted'),
       );
       _scaffoldKey.currentState.showSnackBar(snackBar);
-
-      getUser();
     }
   }
 
