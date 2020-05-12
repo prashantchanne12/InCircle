@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
       initialData: false,
       builder: (context, snapshot) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'InCircle',
           theme: snapshot.data
               ? ThemeData(

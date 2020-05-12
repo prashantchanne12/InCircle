@@ -379,13 +379,18 @@ class _EditProfileState extends State<EditProfile> {
       if (file != null) {
         await compressImage();
         downloadUrl = await uploadImage(file);
-      }
 
-      userRef.document(widget.currentUserId).updateData({
-        'displayName': displayNameController.text,
-        'bio': bioController.text,
-        'photoUrl': file != null ? downloadUrl : currentUser.photoUrl
-      });
+        userRef.document(widget.currentUserId).updateData({
+          'displayName': displayNameController.text,
+          'bio': bioController.text,
+          'photoUrl': downloadUrl,
+        });
+      } else {
+        userRef.document(widget.currentUserId).updateData({
+          'displayName': displayNameController.text,
+          'bio': bioController.text,
+        });
+      }
 
       setState(() {
         isLoading = false;
