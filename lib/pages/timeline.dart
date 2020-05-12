@@ -22,20 +22,20 @@ class _TimelineState extends State<Timeline> {
   List<Post> posts = [];
   List<String> followingList = [];
 
-  getTimeline() async {
-    QuerySnapshot querySnapshot = await timelineRef
-        .document(widget.user.id)
-        .collection('timelinePosts')
-        .orderBy('timestamp', descending: true) // most recent post
-        .getDocuments();
-
-    List<Post> posts =
-        querySnapshot.documents.map((doc) => Post.fromDocument(doc)).toList();
-
-    setState(() {
-      this.posts = posts;
-    });
-  }
+//  getTimeline() async {
+//    QuerySnapshot querySnapshot = await timelineRef
+//        .document(widget.user.id)
+//        .collection('timelinePosts')
+//        .orderBy('timestamp', descending: true) // most recent post
+//        .getDocuments();
+//
+//    List<Post> posts =
+//        querySnapshot.documents.map((doc) => Post.fromDocument(doc)).toList();
+//
+//    setState(() {
+//      this.posts = posts;
+//    });
+//  }
 
   logout() async {
     await googleSignIn.signOut();
@@ -117,25 +117,19 @@ class _TimelineState extends State<Timeline> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          'InCircle',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontFamily: 'mont',
-            fontSize: 22.0,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        elevation: 0.0,
-      ),
-      body: posts == null
-          ? buildNoContent()
-          : RefreshIndicator(
-              onRefresh: () => getTimeline(),
-              child: buildTimeline(),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(
+            'InCircle',
+            style: TextStyle(
+              color: kPrimaryColor,
+              fontFamily: 'mont',
+              fontSize: 22.0,
+              fontWeight: FontWeight.w900,
             ),
-    );
+          ),
+          elevation: 0.0,
+        ),
+        body: posts == null ? buildNoContent() : buildTimeline());
   }
 }

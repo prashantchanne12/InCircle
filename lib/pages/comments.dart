@@ -100,7 +100,6 @@ class _CommentsState extends State<Comments> {
             fontWeight: FontWeight.w900,
           ),
         ),
-        backgroundColor: Colors.white,
       ),
       body: Column(
         children: <Widget>[
