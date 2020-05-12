@@ -11,11 +11,6 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
-// TODO 1: Handle last active
-// TODO 1.1: Give warning to users that chat will be deleted in 15 sec
-// TODO 2: Check internet connectivity
-// TODO 3: Add security to firebase
-
 class ChatScreen extends StatefulWidget {
   final String profileId;
   final String username;

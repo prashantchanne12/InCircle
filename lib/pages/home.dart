@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -76,6 +77,18 @@ class _HomeState extends State<Home> {
   }
 
   handleSignIn(GoogleSignInAccount account) async {
+//    bool isConnected = await checkInternetConnectivity();
+//    if (!isConnected) {
+//      SnackBar snackBar = SnackBar(
+//        backgroundColor: Colors.red,
+//        content: Text(
+//          'No Internet Connection',
+//          overflow: TextOverflow.ellipsis,
+//        ),
+//      );
+//      _scaffoldKey.currentState.showSnackBar(snackBar);
+//      return;
+//    }
     if (account != null) {
       await createUserInFirestore();
       setState(() {
@@ -398,6 +411,17 @@ class _HomeState extends State<Home> {
     return isLogin ? buildHomePage() : buildLoginScreen();
   }
 }
+//
+//checkInternetConnectivity() async {
+//  try {
+//    final result = await InternetAddress.lookup('google.com');
+//    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+//      return true;
+//    }
+//  } on SocketException catch (_) {
+//    return false;
+//  }
+//}
 
 makeUserOffline() {
   // Firestore
