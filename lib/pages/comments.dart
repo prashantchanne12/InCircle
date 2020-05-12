@@ -100,6 +100,15 @@ class _CommentsState extends State<Comments> {
             fontWeight: FontWeight.w900,
           ),
         ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back,
+            color: kPrimaryColor,
+          ),
+        ),
       ),
       body: Column(
         children: <Widget>[

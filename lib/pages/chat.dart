@@ -297,7 +297,9 @@ class _ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () async {
                   messageTextController.clear();
-
+                  if (messageText.isEmpty) {
+                    return;
+                  }
                   if (getData) {
                     _firestore
                         .collection('messages')

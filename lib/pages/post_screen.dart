@@ -38,6 +38,15 @@ class PostScreen extends StatelessWidget {
                   fontFamily: 'mont',
                 ),
               ),
+              leading: (IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: kPrimaryColor,
+                ),
+              )),
             ),
             body: ListView(
               children: <Widget>[

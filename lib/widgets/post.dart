@@ -111,12 +111,12 @@ class _PostState extends State<Post> {
       children: <Widget>[
         buildPostHeader(),
         Padding(
-          padding: EdgeInsets.all(5.0),
+          padding: EdgeInsets.all(4.0),
           child: buildPostImage(),
         ),
         buildPostFooter(),
         SizedBox(
-          height: 15.0,
+          height: 5.0,
         ),
       ],
     );

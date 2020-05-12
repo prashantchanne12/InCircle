@@ -53,6 +53,15 @@ class _EditProfileState extends State<EditProfile> {
             color: kPrimaryColor,
           ),
         ),
+        leading: (IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back,
+            color: kPrimaryColor,
+          ),
+        )),
         actions: <Widget>[
           InkWell(
             onTap: () {
