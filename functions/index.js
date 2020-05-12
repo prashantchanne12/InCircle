@@ -261,45 +261,66 @@ exports.onCreateActivityFeedItem = functions.firestore
     }
   });
 
-//// ---------- onUpdate Message ------------
-//
-//exports.onCreateMessage = functions.firestore
-//    .document("/messages/{chatId}/chats/{docId}")
-//    .onUpdate(async (snapshot, context) => {
-//
-//        const chatId = context.params.chatId;
-//        const docId = context.params.docId;
-//
-//
-//        const userMessages = admin.firestore()
-//                        .collection('messages')
-//                        .doc(chatId)
-//                        .collection('chats')
-//                        .where('isSeen', '==', true);
-//
-//
-//        const querySnapshot = await userMessages.get();
-//
-//
-//        querySnapshot.forEach((doc) => {
-//
-////            followerId = doc.id;
-//
-//            admin
-//                .firestore()
-//                .collection('messages')
-//                .doc(chatId)
-//                .collection('chats')
-//                .doc(doc.id)
-//                .get().then(doc => {
-//
-//                    if(doc.exists){
-//                    setTimeout(doc.ref.delete(),25000);
-//                    }
-//
-//                });
-//        });
-//});
+
+// /messages/102868147774937939400106585613342559026009/chats/K804BAknzFWzCrIENCfy
+
+// ---------- Push Notification Chat Message ------------
+exports.onMessageSent = functions.firestore
+  .document("/messages/{chatId}/chats/{docId}")
+  .onCreate(async (snapshot, context) => {
+    console.log("Activity Feed Item Created", snapshot.data());
+
+    const chatId = context.params.userId;
+    const docId = context.params.docId;
+
+    const chatMessageItem = snapshot.data();
+
+    if(chatMessageItem.isSeen == false){
+
+     // 1) Getting receiver userId and textBody
+        const userId = chatMessageItem.receiverId;
+
+        const userRef = admin.firestore().doc(`users/${userId}`);
+        const doc = await userRef.get();
+
+        // 2) Once we have user, check if they have a notification token; send notification, if they have a token
+        const androidNotificationToken = doc.data().androidNotificationToken;
+
+
+        if (androidNotificationToken) {
+          sendNotification(androidNotificationToken, chatMessageItem);
+        } else {
+          console.log("No token for user, cannot send notification");
+        }
+
+    }
+
+    function sendNotification(androidNotificationToken, chatMessageItem) {
+
+     const body = chatMessageItem.text;
+
+      // 3) Create message for push notification
+      const message = {
+        notification: { body },
+        token: androidNotificationToken,
+        data: { recipient: chatMessageItem.receiverId }
+      };
+
+      // 4) Send message with admin.messaging()
+      admin
+        .messaging()
+        .send(message)
+        .then(response => {
+          // Response is a message ID string
+          console.log("Successfully sent message", response);
+        })
+        .catch(error => {
+          console.log("Error sending message", error);
+        });
+    }
+  });
+
+
 
 // ------- Update User Status (Online/Offline) ------------
 

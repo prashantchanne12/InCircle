@@ -11,6 +11,10 @@ import 'package:in_circle/widgets/progress.dart';
 
 import 'home.dart';
 
+// TODO 1: If user updates the username and profile update them in chat_tiles
+// TODO 1.1: some bug in activity feed
+// TODO 2: save state of dark theme
+
 class ChatScreen extends StatefulWidget {
   final String profileId;
   final String username;
