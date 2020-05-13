@@ -29,3 +29,10 @@
 ## Self-destructive Chats
 
 ![GitHub Logo](https://github.com/prashantchanne12/InCircle/blob/master/images/chat.gif?raw=true)
+
+***
+
+## Dark Mode
+
+![GitHub Logo](https://github.com/prashantchanne12/InCircle/blob/master/images/blackTheme.gif?raw=true)
+
