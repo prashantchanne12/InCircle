@@ -14,7 +14,9 @@
   <img src="https://github.com/prashantchanne12/InCircle/blob/master/images/3.png" width="280" />
 </p>
 
+<br>
 ***
+<br>
 
 <p float="left">
   <img src="https://github.com/prashantchanne12/InCircle/blob/master/images/4.png" width="280" />
