@@ -37,7 +37,9 @@ class MyApp extends StatelessWidget {
                   ),
                   fontFamily: 'mont',
                 ),
-          home: Home(snapshot.data),
+          home: Home(
+            darkThemeEnabled: snapshot.data,
+          ),
         );
       },
     );

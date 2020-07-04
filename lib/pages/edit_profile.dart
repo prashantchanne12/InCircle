@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -407,8 +408,9 @@ class _EditProfileState extends State<EditProfile> {
 
   logout() async {
     makeUserOffline();
-    await googleSignIn.signOut();
-    Navigator.pop(context);
-//    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    await auth.signOut();
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Home()));
   }
 }

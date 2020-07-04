@@ -41,7 +41,7 @@ DocumentSnapshot documentSnapshot;
 class Home extends StatefulWidget {
   final bool darkThemeEnabled;
 
-  Home(this.darkThemeEnabled);
+  Home({this.darkThemeEnabled = true});
 
   @override
   _HomeState createState() => _HomeState();
@@ -165,6 +165,7 @@ class _HomeState extends State<Home> {
         userRef.document(user.uid).get().then((DocumentSnapshot doc) {
           documentSnapshot = doc;
         });
+        configurePushNotifications();
         isLogin = true;
       });
     }
