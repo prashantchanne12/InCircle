@@ -1,7 +1,7 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -20,8 +20,12 @@ import 'package:in_circle/widgets/progress.dart';
 
 final commentsRef = Firestore.instance.collection('comments');
 final postRef = Firestore.instance.collection('posts');
+
+FirebaseUser user;
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final userRef = Firestore.instance.collection('users');
+final FirebaseAuth auth = FirebaseAuth.instance;
+
 final activityFeedRef = Firestore.instance.collection('feed');
 final followersRef = Firestore.instance.collection('followers');
 final followingRef = Firestore.instance.collection('following');
@@ -46,10 +50,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isLogin = false;
   bool isLoading = false;
-  var phones = [];
   int selectIndex = 0;
   PageController pageController;
-//  int count = 0;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -57,52 +59,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-
     pageController = PageController();
-
-    // Google Sign in Listener
-    googleSignIn.onCurrentUserChanged.listen((account) {
-      print(' Account - $account');
-      handleSignIn(account);
-    }, onError: (error) {
-      print('Error in Sigining In..');
-    });
-
-    // Re-authenticate user when ba is reopened
-    googleSignIn.signInSilently(suppressErrors: false).then((value) {
-      handleSignIn(value);
-    }).catchError((error) {
-      print('Error in Signing In : $error');
-    });
-  }
-
-  handleSignIn(GoogleSignInAccount account) async {
-//    bool isConnected = await checkInternetConnectivity();
-//    if (!isConnected) {
-//      SnackBar snackBar = SnackBar(
-//        backgroundColor: Colors.red,
-//        content: Text(
-//          'No Internet Connection',
-//          overflow: TextOverflow.ellipsis,
-//        ),
-//      );
-//      _scaffoldKey.currentState.showSnackBar(snackBar);
-//      return;
-//    }
-    if (account != null) {
-      await createUserInFirestore();
-      setState(() {
-        isLogin = true;
-        isLoading = true;
-      });
-
-      configurePushNotifications();
-    } else {
-      setState(() {
-        isLogin = false;
-        isLoading = false;
-      });
-    }
   }
 
   configurePushNotifications() {
@@ -149,66 +106,78 @@ class _HomeState extends State<Home> {
     pageController.dispose();
   }
 
-  createUserInFirestore() async {
+  Future<void> signInWithGoogle() async {
     setState(() {
       isLoading = true;
     });
-    // Check if the users exists in database
-    final GoogleSignInAccount user = googleSignIn.currentUser;
-    documentSnapshot = await userRef.document(user.id).get();
 
-    if (!documentSnapshot.exists) {
-      if (userData == null) {
-        userData = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CreateAccount(
-              user: user,
-            ),
-          ),
-        );
+    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
 
-        // Let's add user to database
-        userRef.document(user.id).setData({
-          'id': user.id,
-          'photoUrl': userData.photoUrl,
-          'email': user.email,
-          'displayName': userData.displayName,
-          'bio': '',
-          'username': userData.username,
-          'timestamp': timestamp,
-        });
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken);
 
+    final AuthResult authResult = await auth.signInWithCredential(credential);
+    user = authResult.user;
+    print('User created : ${user.displayName}');
+
+    final FirebaseUser firebaseUser = await auth.currentUser();
+
+    userRef.document(firebaseUser.uid).get().then((document) {
+      if (document.exists) {
         setState(() {
-          userRef.document(user.id).get().then((DocumentSnapshot doc) {
-            documentSnapshot = doc;
-          });
+          documentSnapshot = document;
+          currentUser = User.fromDocument(documentSnapshot);
+          makeUserOnline();
+          isLogin = true;
         });
+      } else {
+        gotoSetupProfile();
       }
+    });
+  }
+
+  gotoSetupProfile() async {
+    if (userData == null) {
+      userData = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CreateAccount(
+            user: user,
+          ),
+        ),
+      );
+
+//         Let's add user to database
+      userRef.document(user.uid).setData({
+        'id': user.uid,
+        'photoUrl': userData.photoUrl,
+        'email': user.email,
+        'displayName': userData.displayName,
+        'bio': '',
+        'username': userData.username,
+        'timestamp': timestamp,
+      });
+
+      setState(() {
+        userRef.document(user.uid).get().then((DocumentSnapshot doc) {
+          documentSnapshot = doc;
+        });
+        isLogin = true;
+      });
     }
-    documentSnapshot = await userRef.document(user.id).get();
+
+    documentSnapshot = await userRef.document(user.uid).get();
     currentUser = User.fromDocument(documentSnapshot);
     makeUserOnline();
-//    QuerySnapshot querySnapshot = await activityFeedRef
-//        .document(currentUser.id)
-//        .collection('feedItems')
-//        .orderBy('timestamp', descending: true)
-//        .where('isSeen', isEqualTo: false)
-//        .limit(50)
-//        .getDocuments();
-//
-//    int pages = querySnapshot.documents.length;
-//    setState(() {
-//      count = pages;
-//    });
-
-//    print(currentUser.displayName);
   }
 
   int page = 0;
 
   login() {
-    googleSignIn.signIn();
+    signInWithGoogle();
   }
 
   logout() async {

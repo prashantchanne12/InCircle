@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateAccount extends StatefulWidget {
-  final GoogleSignInAccount user;
+  final FirebaseUser user;
 
   CreateAccount({@required this.user});
 
@@ -368,3 +369,28 @@ class UserData {
 
   UserData({this.photoUrl, this.username, this.displayName});
 }
+
+//-------- GOOGLE SIGN IN -----------
+
+//Future<void> signInWithGoogle() async {
+//  final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+//  final GoogleSignInAuthentication googleSignInAuthentication =
+//  await googleSignInAccount.authentication;
+//
+//  final AuthCredential credential = GoogleAuthProvider.getCredential(
+//      idToken: googleSignInAuthentication.idToken,
+//      accessToken: googleSignInAuthentication.accessToken);
+//
+//  final AuthResult authResult = await auth.signInWithCredential(credential);
+//  user = authResult.user;
+//
+//  assert(!user.isAnonymous);
+//  assert(await user.getIdToken() != null);
+//
+//  final FirebaseUser currentUser = await auth.currentUser();
+//  assert(user.uid == currentUser.uid);
+//
+//  print('User created : ${user.displayName}');
+//
+//  addUserToFireStore(user);
+//}
