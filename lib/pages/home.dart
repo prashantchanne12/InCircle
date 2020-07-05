@@ -59,6 +59,21 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
+    auth.currentUser().then((user) {
+      if (user != null) {
+        print(user.uid);
+        userRef.document(user.uid).get().then((doc) {
+          documentSnapshot = doc;
+          currentUser = User.fromDocument(documentSnapshot);
+          makeUserOnline();
+          setState(() {
+            isLogin = true;
+          });
+        });
+      }
+    });
+
     pageController = PageController();
   }
 
